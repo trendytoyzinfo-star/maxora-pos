@@ -34,7 +34,7 @@ export async function pullSnapshot(base) {
   await kv.set('snapshotAt', Date.now());
   await mergeBookings(s.data);
   try {
-    localStorage.setItem('orderrestro.standalone.ready', '1'); // lets the "can't reach the server" page offer this
+    localStorage.setItem('maxora.standalone.ready', '1'); // lets the "can't reach the server" page offer this
   } catch {
     /* storage blocked */
   }

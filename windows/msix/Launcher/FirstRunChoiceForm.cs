@@ -1,4 +1,4 @@
-namespace OrderRestro.Launcher;
+namespace MaxoraPOS.Launcher;
 
 internal enum FirstRunChoice
 {
@@ -7,7 +7,7 @@ internal enum FirstRunChoice
 }
 
 /// <summary>
-/// The first screen a fresh install shows: run OrderRestro on this computer,
+/// The first screen a fresh install shows: run Maxora POS on this computer,
 /// or connect to a server that already runs somewhere else. A brand header,
 /// two clearly different choices (the local one is the recommended path for a
 /// first-time owner) and a short "what happens next" strip so nobody is
@@ -28,7 +28,7 @@ internal sealed class FirstRunChoiceForm : Form
 
     public FirstRunChoiceForm()
     {
-        Text = "OrderRestro";
+        Text = "Maxora POS";
         AutoScaleMode = AutoScaleMode.Dpi;
         AutoScaleDimensions = new SizeF(96f, 96f);
         Font = new Font("Segoe UI", 10f);
@@ -52,7 +52,7 @@ internal sealed class FirstRunChoiceForm : Form
             Size = new Size(72, 72),
             SizeMode = PictureBoxSizeMode.Zoom,
             BackColor = Color.Transparent,
-            AccessibleName = "OrderRestro logo",
+            AccessibleName = "Maxora POS logo",
         };
         try
         {
@@ -62,7 +62,7 @@ internal sealed class FirstRunChoiceForm : Form
         catch { /* the logo is decoration: never block the first run on it */ }
         var title = new Label
         {
-            Text = "Welcome to OrderRestro",
+            Text = "Welcome to Maxora POS",
             Font = new Font("Segoe UI Semibold", 22f, FontStyle.Bold),
             ForeColor = Color.White,
             BackColor = Color.Transparent,
@@ -85,7 +85,7 @@ internal sealed class FirstRunChoiceForm : Form
 
         var ask = new Label
         {
-            Text = "How would you like to use OrderRestro on this computer?",
+            Text = "How would you like to use Maxora POS on this computer?",
             Font = new Font("Segoe UI Semibold", 12f, FontStyle.Bold),
             ForeColor = Ink,
             AutoSize = false,
@@ -112,7 +112,7 @@ internal sealed class FirstRunChoiceForm : Form
             glyph: "", // Segoe MDL2: Cloud
             heading: "Connect to my existing server",
             badge: null,
-            body: "Already running OrderRestro on another computer or in the cloud? Connect this app to your existing restaurant.",
+            body: "Already running Maxora POS on another computer or in the cloud? Connect this app to your existing restaurant.",
             note: "You will need your server's address (for example orders.myrestaurant.com).",
             button: "Connect to server",
             primary: false,

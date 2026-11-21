@@ -1,6 +1,6 @@
 "use client";
 
-import type { StockJournalType } from "@nodedr-restaurant/types";
+import type { StockJournalType } from "@maxora/types";
 import { ArrowLeftRight, ChefHat, ClipboardCheck, Trash2 } from "lucide-react";
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";

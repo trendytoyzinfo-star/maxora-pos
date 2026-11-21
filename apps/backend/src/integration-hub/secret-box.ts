@@ -44,7 +44,7 @@ function key(): Buffer {
     hkdfSync(
       'sha256',
       material,
-      'orderrestro-integration-secrets',
+      'maxora-integration-secrets',
       dedicated ? 'dedicated-key' : 'jwt-derived-key',
       32,
     ),

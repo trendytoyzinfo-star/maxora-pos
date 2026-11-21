@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import type { ProductionEntryDto } from '@nodedr-restaurant/types';
+import type { ProductionEntryDto } from '@maxora/types';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toCsv } from '../reports/csv';
 import { costBatch, priceMetrics } from './manufacturing-calc';

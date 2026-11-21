@@ -11,7 +11,7 @@ export function DemoBanner() {
     <div role="status" className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 bg-primary px-3 py-1.5 text-center text-xs font-medium text-primary-foreground">
       <span>Live demo: sample data only, nothing is real.</span>
       <span className="opacity-90">Everything resets every {data.resetEveryHours} hours{at ? ` (next about ${at})` : ""}. Some admin features are switched off.</span>
-      <a href="https://orderrestro.nodedr.com/" className="underline">Get OrderRestro</a>
+      <a href="https://maxora.example.com/" className="underline">Get Maxora POS</a>
     </div>
   );
 }

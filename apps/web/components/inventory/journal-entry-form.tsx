@@ -1,6 +1,6 @@
 "use client";
 
-import type { IngredientUnit, StockJournalType, WasteReason } from "@nodedr-restaurant/types";
+import type { IngredientUnit, StockJournalType, WasteReason } from "@maxora/types";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { ItemCombobox } from "@/components/inventory/item-combobox";

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Installs OrderRestro.msix on a normal Windows 10/11 PC (outside the Microsoft Store).
+  Installs MaxoraPOS.msix on a normal Windows 10/11 PC (outside the Microsoft Store).
 
 .DESCRIPTION
   Windows refuses an .msix whose signing certificate it does not trust ("The
@@ -10,7 +10,7 @@
   installs the package. Safe to run again to update an existing install:
   local data is kept.
 
-  Usually started through Install-OrderRestro.cmd (double-click).
+  Usually started through Install-MaxoraPOS.cmd (double-click).
 #>
 [CmdletBinding()]
 param(
@@ -29,7 +29,7 @@ function Wait-Exit([int]$code) {
 try {
     if (-not $Msix) {
         $found = Get-ChildItem -Path $PSScriptRoot -Filter *.msix -File | Select-Object -First 1
-        if (-not $found) { throw "No .msix file found next to this script ($PSScriptRoot). Keep OrderRestro.msix in the same folder." }
+        if (-not $found) { throw "No .msix file found next to this script ($PSScriptRoot). Keep MaxoraPOS.msix in the same folder." }
         $Msix = $found.FullName
     }
     $Msix = (Resolve-Path -LiteralPath $Msix).Path
@@ -46,7 +46,7 @@ try {
     }
 
     if ([Environment]::OSVersion.Version.Build -lt 17763) {
-        throw 'OrderRestro needs Windows 10 version 1809 or newer (or Windows 11).'
+        throw 'Maxora POS needs Windows 10 version 1809 or newer (or Windows 11).'
     }
 
     # The package unpacks to roughly 1.5 GB and the first start builds a database: stop early, with a clear
@@ -59,7 +59,7 @@ try {
     Write-Host "Package: $Msix"
     $sig = Get-AuthenticodeSignature -LiteralPath $Msix
     if (-not $sig.SignerCertificate) {
-        throw 'This package is not signed, so Windows will not install it outside the Microsoft Store. Download the signed OrderRestro.msix again.'
+        throw 'This package is not signed, so Windows will not install it outside the Microsoft Store. Download the signed MaxoraPOS.msix again.'
     }
     $cert = $sig.SignerCertificate
 
@@ -70,7 +70,7 @@ try {
         $already = Get-ChildItem Cert:\LocalMachine\TrustedPeople | Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
         if (-not $already) {
             Write-Host "Trusting the app certificate ($($cert.Subject)) for app installs..."
-            $tmp = Join-Path $env:TEMP ('orderrestro-' + [guid]::NewGuid().ToString('N') + '.cer')
+            $tmp = Join-Path $env:TEMP ('maxora-' + [guid]::NewGuid().ToString('N') + '.cer')
             Export-Certificate -Cert $cert -FilePath $tmp | Out-Null
             try { Import-Certificate -FilePath $tmp -CertStoreLocation Cert:\LocalMachine\TrustedPeople | Out-Null }
             finally { Remove-Item $tmp -Force -ErrorAction SilentlyContinue }
@@ -98,21 +98,21 @@ try {
             Write-Host 'WebView2 installed.' -ForegroundColor Green
         }
         catch {
-            Write-Warning "Could not install the WebView2 Runtime automatically ($($_.Exception.Message)). If OrderRestro opens blank, install it from https://go.microsoft.com/fwlink/p/?LinkId=2124703 and start the app again."
+            Write-Warning "Could not install the WebView2 Runtime automatically ($($_.Exception.Message)). If Maxora POS opens blank, install it from https://go.microsoft.com/fwlink/p/?LinkId=2124703 and start the app again."
         }
         finally { Remove-Item $boot -Force -ErrorAction SilentlyContinue }
     }
 
-    Write-Host 'Installing OrderRestro (an existing install is updated, your data is kept)...'
+    Write-Host 'Installing Maxora POS (an existing install is updated, your data is kept)...'
     Add-AppxPackage -Path $Msix -ForceApplicationShutdown
 
-    $pkg = Get-AppxPackage -Name '*OrderRestro*' | Select-Object -First 1
+    $pkg = Get-AppxPackage -Name '*Maxora POS*' | Select-Object -First 1
     if (-not $pkg) { throw 'The install finished but the app is not registered. Restart the PC and run this installer again.' }
     Write-Host "Installed: $($pkg.PackageFullName)" -ForegroundColor Green
 
     if (-not $NoLaunch) {
-        Write-Host 'Opening OrderRestro. The very first start sets up the local database and can take several minutes - leave it open.'
-        Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!OrderRestro"
+        Write-Host 'Opening Maxora POS. The very first start sets up the local database and can take several minutes - leave it open.'
+        Start-Process "shell:AppsFolder\$($pkg.PackageFamilyName)!Maxora POS"
     }
     Wait-Exit 0
 }
@@ -123,8 +123,8 @@ catch {
     Write-Host "Error code: 0x$hr"
     switch -Regex ($_.Exception.Message) {
         '0x800B010[9A]' { Write-Host 'Windows does not trust the package certificate. Run this installer as administrator (right-click > Run as administrator).' }
-        '0x80073CF[39]' { Write-Host 'A different version is already installed. Uninstall OrderRestro from Settings > Apps, then run this installer again.' }
-        '0x80073D02'    { Write-Host 'OrderRestro is running. Close it (also from the system tray) and run this installer again.' }
+        '0x80073CF[39]' { Write-Host 'A different version is already installed. Uninstall Maxora POS from Settings > Apps, then run this installer again.' }
+        '0x80073D02'    { Write-Host 'Maxora POS is running. Close it (also from the system tray) and run this installer again.' }
         '0x80073CFF'    { Write-Host 'Sideloading apps is turned off. In Settings > System > For developers (or Privacy & security > For developers) allow installing apps from outside the Store.' }
     }
     Wait-Exit 1

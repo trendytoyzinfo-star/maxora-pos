@@ -1,4 +1,4 @@
-# OrderRestro 1.39.1
+# Maxora POS 1.39.1
 
 - **Stock Journal: produce menu items directly.** The finished-product picker now lists your menu items (Fried Rice, Momo...). Picking one that has no stock item asks to confirm, then creates a stock item with the same name and links it to the menu item (one per sale). Menu price and tax are not changed.
 - **Existing finished products** that are not on the POS menu can be put on it from the voucher (you type category, price and tax).

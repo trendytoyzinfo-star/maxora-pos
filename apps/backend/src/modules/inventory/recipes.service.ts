@@ -5,7 +5,7 @@ import {
   ConflictException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import type { ProductRecipeDto } from '@nodedr-restaurant/types';
+import type { ProductRecipeDto } from '@maxora/types';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';
 import { toBaseQuantity } from './units';

@@ -1,6 +1,6 @@
 "use client";
 
-import { type AdItem, screenFor } from "@nodedr-restaurant/types";
+import { type AdItem, screenFor } from "@maxora/types";
 import { useSearchParams } from "next/navigation";
 import { QRCodeSVG } from "qrcode.react";
 import { Suspense, useCallback, useEffect, useState } from "react";
@@ -162,7 +162,7 @@ function ServerDisplay({ token }: { token: string }) {
   if (error === "missing") {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background p-10 text-center">
-        <div><p className="text-3xl font-semibold">This screen is not set up</p><p className="mt-2 text-muted-foreground">Open Settings &gt; Customer screen in OrderRestro and copy this screen&rsquo;s link again.</p></div>
+        <div><p className="text-3xl font-semibold">This screen is not set up</p><p className="mt-2 text-muted-foreground">Open Settings &gt; Customer screen in Maxora POS and copy this screen&rsquo;s link again.</p></div>
       </main>
     );
   }

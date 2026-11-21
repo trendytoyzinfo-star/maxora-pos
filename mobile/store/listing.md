@@ -1,18 +1,18 @@
 # Store listing text (Google Play and App Store)
 
-**App name:** OrderRestro
+**App name:** Maxora POS
 **Subtitle / short description (80):** Restaurant billing, KOT, tables and kitchen. Works offline, no server needed.
 **Category:** Business (Play: Business; App Store: Business, secondary Food & Drink)
-**Contact email:** info@nodedr.com
-**Website:** https://orderrestro.nodedr.com
-**Privacy policy:** https://orderrestro.nodedr.com/privacy
-**Delete account page:** https://orderrestro.nodedr.com/delete-account
-**Support URL:** https://orderrestro.nodedr.com/contact
+**Contact email:** info@maxora.com
+**Website:** https://maxora.example.com
+**Privacy policy:** https://maxora.example.com/privacy
+**Delete account page:** https://maxora.example.com/delete-account
+**Support URL:** https://maxora.example.com/contact
 **Age rating:** 4+ / Everyone (no user-generated public content, no purchases)
 
 ## Full description
 
-OrderRestro is a restaurant point of sale for your phone. Start on the phone with no server and no internet: add your dishes and tables, take orders, print bills and kitchen tickets, and close the day. When you grow, connect the restaurant's own OrderRestro server (open source, hosted by you) and the same app becomes the staff and rider app for it.
+Maxora POS is a restaurant point of sale for your phone. Start on the phone with no server and no internet: add your dishes and tables, take orders, print bills and kitchen tickets, and close the day. When you grow, connect the restaurant's own Maxora POS server (open source, hosted by you) and the same app becomes the staff and rider app for it.
 
 Billing on the phone
 - Menu with categories, tax, half portions, add-ons and barcodes (camera or a USB/Bluetooth scanner)
@@ -114,7 +114,7 @@ No ads. No tracking. Delete your account any time.
 - Readable status bar on Android 15 and 16
 
 ## First release (1.14.1)
-First release of the OrderRestro app for Android and iPhone.
+First release of the Maxora POS app for Android and iPhone.
 
 ## Keywords (App Store, 100 chars)
 restaurant,pos,delivery,rider,kitchen,orders,waiter,cashier,dashboard,self-hosted

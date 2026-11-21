@@ -23,7 +23,7 @@ import type {
   RestoreBackupDto,
   SessionUser,
   SetBackupConfigDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { assertSafeUploadsArchive, SAFE_EXTRACT_FLAGS } from './safe-tar';
 import { AuditService } from '../audit/audit.service';
 import type { NotifyPayload } from '../notifications/notifications.service';
@@ -53,7 +53,7 @@ function mask(value: string): string {
  * Full-instance backup (Postgres + the uploads volume) to any S3-compatible
  * bucket, ported from zulivio's real, working `backup/` module
  * (~/zulivio/apps/backend/src/backup/) and adapted to this repo's
- * conventions: Zod schemas from @nodedr-restaurant/types instead of
+ * conventions: Zod schemas from @maxora/types instead of
  * class-validator DTOs, `AuditService`/`NotificationsService` instead of
  * zulivio's audit/notification equivalents, and a permission-key gate
  * (`backup.manage`, checked by the controller's `@Auth()`) instead of
@@ -345,7 +345,7 @@ export class BackupService {
       data: { triggeredById, status: 'PENDING' },
     });
     const workDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'orderrestro-backup-'),
+      path.join(os.tmpdir(), 'maxora-backup-'),
     );
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const dbDumpPath = path.join(workDir, 'db.dump');
@@ -560,7 +560,7 @@ export class BackupService {
       entityId: 'local',
     });
     const workDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'orderrestro-export-'),
+      path.join(os.tmpdir(), 'maxora-export-'),
     );
     try {
       const dbDumpPath = path.join(workDir, 'db.dump');
@@ -652,7 +652,7 @@ export class BackupService {
 
     const s3 = this.s3Client(config);
     const workDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'orderrestro-restore-'),
+      path.join(os.tmpdir(), 'maxora-restore-'),
     );
     const dbDumpPath = path.join(workDir, 'db.dump');
     const uploadsArchivePath = path.join(workDir, 'uploads.tar.gz');

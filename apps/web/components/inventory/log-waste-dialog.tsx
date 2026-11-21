@@ -1,6 +1,6 @@
 "use client";
 
-import type { IngredientUnit, WasteReason } from "@nodedr-restaurant/types";
+import type { IngredientUnit, WasteReason } from "@maxora/types";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";

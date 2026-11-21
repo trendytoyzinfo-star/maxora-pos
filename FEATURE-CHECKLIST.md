@@ -400,7 +400,7 @@ partially built, the note says what's missing.
 
 | Feature | Status | Note |
 |---|---|---|
-| GST-inclusive pricing (CGST/SGST backed out correctly) | Shipped | Verified numerically, see docs/decisions ADR in nodedr-ecommerce-template |
+| GST-inclusive pricing (CGST/SGST backed out correctly) | Shipped | Verified numerically, see docs/decisions ADR in maxora-ecommerce-template |
 | UPI as a payment method | Shipped | Recorded as a payment method, no live UPI QR collection |
 | Indian currency (INR) | Shipped | Default currency |
 | Dynamic UPI QR, IGST, HSN/SAC, FSSAI, WhatsApp receipts/ordering, Tally/Razorpay/PhonePe/BharatPe, Swiggy/Zomato integration | Planned | None integrated |

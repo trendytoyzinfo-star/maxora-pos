@@ -50,7 +50,7 @@ export default function BuzzersPage() {
         <p><b className="text-foreground">Which hardware?</b> Not decided yet. Two ways to connect a buzzer are built so the real devices can be wired in once they are tested:</p>
         <ul className="list-disc space-y-1 pl-5">
           <li><b className="text-foreground">Simulated / polling device:</b> the buzzer (or the Simulator page) asks the server &ldquo;is there a page for me?&rdquo; with its own token every second or two and acknowledges it. Needs a device that can make HTTP requests.</li>
-          <li><b className="text-foreground">Webhook base station:</b> the server POSTs a JSON call to an address you give it, signed with a secret (HMAC-SHA256 in the <code>X-OrderRestro-Signature</code> header). For a base station or small gateway that then drives the buzzers by radio.</li>
+          <li><b className="text-foreground">Webhook base station:</b> the server POSTs a JSON call to an address you give it, signed with a secret (HMAC-SHA256 in the <code>X-Maxora-Signature</code> header). For a base station or small gateway that then drives the buzzers by radio.</li>
         </ul>
         <p>Nothing here claims to work with a particular buzzer product until it has been tested on the real devices.</p>
       </Card>

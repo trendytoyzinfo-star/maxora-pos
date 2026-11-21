@@ -82,7 +82,7 @@ unchanged.
 
 ## Phones and the local network
 
-The restaurant's OrderRestro server is the hub. If it is on the same Wi-Fi as the phones, the phones reach it by its
+The restaurant's Maxora POS server is the hub. If it is on the same Wi-Fi as the phones, the phones reach it by its
 local address first and need no internet: sales, shifts, production, waste and receipts all sync over the LAN.
 Phones do not talk to each other directly; a phone with no route to the server keeps everything and sends it later.
 Each phone signs in with its own device id (`did` in its session); removing it under Settings > Phones ends that

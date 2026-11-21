@@ -224,7 +224,7 @@ export class WebhooksService {
         payload: {
           event: 'test',
           createdAt: new Date().toISOString(),
-          data: { message: 'Hello from OrderRestro' },
+          data: { message: 'Hello from Maxora POS' },
         },
       },
     });
@@ -298,9 +298,9 @@ export class WebhooksService {
         netOptionsFromEnv(),
       );
       statusCode = await this.post(target, body, {
-        'X-OrderRestro-Event': d.event,
-        'X-OrderRestro-Delivery': d.id,
-        'X-OrderRestro-Signature': signPayload(
+        'X-Maxora-Event': d.event,
+        'X-Maxora-Delivery': d.id,
+        'X-Maxora-Signature': signPayload(
           secret,
           body,
           Math.floor(Date.now() / 1000),
@@ -357,7 +357,7 @@ export class WebhooksService {
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(body),
-            'User-Agent': 'OrderRestro-Webhooks/1',
+            'User-Agent': 'Maxora POS-Webhooks/1',
             ...headers,
           },
           // Connect to the address we already vetted; TLS still validates

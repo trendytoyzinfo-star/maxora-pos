@@ -23,7 +23,7 @@ import {
   tableLayoutUpdateSchema,
   type SessionUser,
   type TableLayoutUpdateDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { z } from 'zod';
 import { Auth } from '../../common/decorators/auth.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';

@@ -1,6 +1,6 @@
 "use client";
 
-import type { IngredientUnit } from "@nodedr-restaurant/types";
+import type { IngredientUnit } from "@maxora/types";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {

@@ -6,7 +6,7 @@ import {
 import type {
   SupplierInvoiceDto,
   SupplierPaymentDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { PrismaService } from '../../prisma/prisma.service';
 import { round2 } from '../../common/money';
 
@@ -87,7 +87,7 @@ export class SupplierInvoicesService {
 
   // Read-modify-write inside the transaction, never a DB `increment` — same
   // Decimal-balance discipline this project uses everywhere else (see
-  // [[project_nodedr_restaurant_pos]] / [[project_nodedr_pos]] float-drift
+  // [[project_maxora_pos]] / [[project_maxora_pos]] float-drift
   // lesson), so two concurrent payments against the same invoice can't
   // silently lose one of them.
   async recordPayment(

@@ -7,7 +7,7 @@
   * **Voluntary service charge:** set a % in Sync > Shop settings. The cashier ticks it only when the guest agrees (never compulsory). Not taxed; reaches the server as a tip.
   * **Staff PINs:** each person switches in with a 4-8 digit PIN, every bill records who took it, and discounts, refunds, pay later, cancelling sent dishes, closing the day and menu changes need a manager's PIN. Optional idle lock. The first PIN on a phone must be a manager's.
 * **Phone books reach the server.** On a server-linked phone, refunds, expenses, money collected later and the day-end cash count are sent too (each safe to resend). Cash counts show in Accounting > Cash close > Phone tills.
-* **Daily automatic backup** of the phone account to Download/OrderRestro (keeps 7).
+* **Daily automatic backup** of the phone account to Download/MaxoraPOS (keeps 7).
 * **Safe with older servers.** The phone asks the server what it supports. Against a server older than 1.38 it hides pay later and the service charge (an older server would drop them from the sale) and keeps refunds and expenses waiting on the phone until the server is updated, with a note on the Sync tab.
 * **Fixes.** Order lines now store their portion (Half/Full). The offline price check no longer double-counts tax on unchanged lines in tax-exclusive branches. A checkbox in the cart could never be ticked. Add person keeps the typed name after a PIN error. Close the day shows money collected on owed bills as part of the payments instead of as an extra line.
 * **Stock journal:** every dropdown is a searchable picker.

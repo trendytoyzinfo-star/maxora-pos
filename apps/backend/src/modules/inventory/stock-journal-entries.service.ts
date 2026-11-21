@@ -10,7 +10,7 @@ import type {
   StockJournalEntryDto,
   StockJournalLineDto,
   StockJournalType,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { AuditService } from '../../audit/audit.service';
 import { localDate } from '../../common/time';
 import { PrismaService } from '../../prisma/prisma.service';

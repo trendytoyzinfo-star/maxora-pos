@@ -1,7 +1,7 @@
-# Connecting your own website (Next.js on `www`, OrderRestro behind a Cloudflare Tunnel)
+# Connecting your own website (Next.js on `www`, Maxora POS behind a Cloudflare Tunnel)
 
 The common setup: the public site lives on separate hosting at
-`www.example.com`; OrderRestro runs on a machine in the restaurant and is
+`www.example.com`; Maxora POS runs on a machine in the restaurant and is
 reached from the internet through a Cloudflare Tunnel at `api.example.com`.
 
 ```
@@ -11,12 +11,12 @@ Visitor's browser ──HTTPS──▶ www.example.com  (Next.js, any host)
                       https://api.example.com/api/v1/integrations/...
                                    │  Cloudflare Tunnel (outbound from the restaurant)
                                    ▼
-        cloudflared ─▶ web:3000 (OrderRestro web) ─▶ backend:4000 ─▶ postgres:5432
+        cloudflared ─▶ web:3000 (Maxora POS web) ─▶ backend:4000 ─▶ postgres:5432
                                    └── only `web` is reachable; the rest stay on the private Docker network
 ```
 
-The browser never talks to OrderRestro and never sees the key: it calls the
-website's own backend, which calls OrderRestro.
+The browser never talks to Maxora POS and never sees the key: it calls the
+website's own backend, which calls Maxora POS.
 
 ## 1. Create the key
 
@@ -38,10 +38,10 @@ it issues a new secret with the same scopes and location, moves the old key's
 orders to it so status and customer lookups keep working, and revokes the old
 key immediately. Update the website's environment with the new secret.
 
-## 2. Expose OrderRestro with a Cloudflare Tunnel
+## 2. Expose Maxora POS with a Cloudflare Tunnel
 
 1. Add the domain to Cloudflare. In **Networking > Tunnels** create a
-   remotely-managed tunnel and install `cloudflared` on the OrderRestro machine
+   remotely-managed tunnel and install `cloudflared` on the Maxora POS machine
    (the dashboard shows the exact command with your token).
 2. On the tunnel's **Routes** tab choose **Add route > Published application**:
    subdomain `api`, domain `example.com`, **Service URL**:
@@ -72,7 +72,7 @@ services:
     depends_on: [web]
 ```
 
-### OrderRestro `.env` for HTTPS behind the tunnel
+### Maxora POS `.env` for HTTPS behind the tunnel
 
 ```env
 COOKIE_SECURE=true                      # staff logins over https://api.example.com
@@ -130,18 +130,18 @@ Cloudflare Access service tokens, as an extra layer in front of the key.
 
 ```env
 # .env.local on the website (server-only: no NEXT_PUBLIC_ prefix!)
-ORDERRESTRO_URL=https://api.example.com
-ORDERRESTRO_API_KEY=ordr_ext_xxxxxxxxxxxxxxxxxxxxxxxx
-ORDERRESTRO_LOCATION_ID=<location id>
+MAXORA_URL=https://api.example.com
+MAXORA_API_KEY=ordr_ext_xxxxxxxxxxxxxxxxxxxxxxxx
+MAXORA_LOCATION_ID=<location id>
 ```
 
 ```ts
-// lib/orderrestro.ts
+// lib/maxora.ts
 import 'server-only';
 
-const base = `${process.env.ORDERRESTRO_URL}/api/v1/integrations`;
+const base = `${process.env.MAXORA_URL}/api/v1/integrations`;
 
-export async function orderrestro<T>(
+export async function maxora<T>(
   path: string,
   init: RequestInit & { idempotencyKey?: string } = {},
 ): Promise<T> {
@@ -150,29 +150,29 @@ export async function orderrestro<T>(
     ...rest,
     cache: 'no-store',
     headers: {
-      Authorization: `Bearer ${process.env.ORDERRESTRO_API_KEY}`,
+      Authorization: `Bearer ${process.env.MAXORA_API_KEY}`,
       'Content-Type': 'application/json',
       ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
     },
   });
-  if (!res.ok) throw new OrderrestroError(res.status, await res.text());
+  if (!res.ok) throw new MaxoraError(res.status, await res.text());
   return res.json() as Promise<T>;
 }
 
-export class OrderrestroError extends Error {
+export class MaxoraError extends Error {
   constructor(public status: number, public body: string) {
-    super(`OrderRestro ${status}`); // never put request data (phone/address) in the message
+    super(`Maxora POS ${status}`); // never put request data (phone/address) in the message
   }
 }
 ```
 
 ```ts
-// app/api/order/route.ts   (the browser posts here, never to OrderRestro)
+// app/api/order/route.ts   (the browser posts here, never to Maxora POS)
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { orderrestro, OrderrestroError } from '@/lib/orderrestro';
+import { maxora, MaxoraError } from '@/lib/maxora';
 
-const loc = process.env.ORDERRESTRO_LOCATION_ID!;
+const loc = process.env.MAXORA_LOCATION_ID!;
 const Body = z.object({
   idempotencyKey: z.string().uuid(), // generated once when the checkout page loads
   type: z.enum(['TAKEAWAY', 'DELIVERY']),
@@ -193,14 +193,14 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: 'Invalid order' }, { status: 400 });
   const { idempotencyKey, ...order } = parsed.data; // no prices: the server prices the order
   try {
-    const placed = await orderrestro<{ id: string }>(`/locations/${loc}/orders`, {
+    const placed = await maxora<{ id: string }>(`/locations/${loc}/orders`, {
       method: 'POST',
       body: JSON.stringify(order),
       idempotencyKey,
     });
     return NextResponse.json({ id: placed.id }, { status: 201 });
   } catch (e) {
-    if (e instanceof OrderrestroError && e.status === 400)
+    if (e instanceof MaxoraError && e.status === 400)
       return NextResponse.json({ error: 'Please check your order and address' }, { status: 400 });
     return NextResponse.json({ error: 'Ordering is unavailable right now' }, { status: 502 });
   }
@@ -211,12 +211,12 @@ export async function POST(req: Request) {
 // app/api/order/[id]/route.ts  (status page; add your own check that this
 // visitor owns the order, e.g. a signed cookie set when they placed it)
 import { NextResponse } from 'next/server';
-import { orderrestro } from '@/lib/orderrestro';
+import { maxora } from '@/lib/maxora';
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const order = await orderrestro<any>(
-    `/locations/${process.env.ORDERRESTRO_LOCATION_ID}/orders/${encodeURIComponent(id)}`,
+  const order = await maxora<any>(
+    `/locations/${process.env.MAXORA_LOCATION_ID}/orders/${encodeURIComponent(id)}`,
   );
   // Public status page: return only what the visitor needs.
   return NextResponse.json({ status: order.status, acceptance: order.acceptance,
@@ -226,7 +226,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
 // Backend-only fulfilment lookup (customer mobile + address), e.g. for your own
 // notification job. Requires the orders:read_customer scope; never forward this
 // to the browser:
-//   orderrestro(`/locations/${loc}/orders/${id}?include=customer`)
+//   maxora(`/locations/${loc}/orders/${id}?include=customer`)
 ```
 
 Order IDs are unguessable but not secret, so the website must prove a visitor
@@ -264,7 +264,7 @@ placed the order.
 ## 4. Check it works
 
 ```bash
-curl -sS -H "Authorization: Bearer $ORDERRESTRO_API_KEY" \
+curl -sS -H "Authorization: Bearer $MAXORA_API_KEY" \
   https://api.example.com/api/v1/integrations/locations        # 200 with your key
 curl -sS -o /dev/null -w '%{http_code}\n' https://api.example.com/api/v1/integrations/locations  # 401 without
 curl -sS -o /dev/null -w '%{http_code}\n' https://api.example.com/api/docs                        # 404 in production

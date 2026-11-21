@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import type { SessionUser } from '@nodedr-restaurant/types';
+import type { SessionUser } from '@maxora/types';
 import { AuditService } from '../audit/audit.service';
 import {
   assertMayManageRole,

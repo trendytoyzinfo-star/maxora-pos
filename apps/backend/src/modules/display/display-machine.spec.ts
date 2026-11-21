@@ -2,7 +2,7 @@ import {
   playableAds,
   screenFor,
   type DisplayStateDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 
 const cfg = { idleSeconds: 45, thankYouSeconds: 8 };
 const cart = (n = 1): DisplayStateDto => ({

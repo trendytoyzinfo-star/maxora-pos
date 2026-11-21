@@ -300,7 +300,7 @@ export class PagingService {
       'Content-Type': 'application/json',
     };
     if (b.webhookSecret)
-      headers['X-OrderRestro-Signature'] = createHmac('sha256', b.webhookSecret)
+      headers['X-Maxora-Signature'] = createHmac('sha256', b.webhookSecret)
         .update(body)
         .digest('hex');
     try {

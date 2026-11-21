@@ -17,7 +17,7 @@ import {
 } from './adapters/adapter';
 import { getAdapter } from './adapters/registry';
 import { fromMinor, toMinor } from './money';
-import type { RefundDto } from '@nodedr-restaurant/types';
+import type { RefundDto } from '@maxora/types';
 import { PaymentGatewaysService } from './payment-gateways.service';
 
 // A link already made for this exact bill is reused for this long, so a
@@ -452,7 +452,7 @@ export class GatewayPaymentsService {
     const adapter = getAdapter(entry?.adapter);
     if (!conn || !adapter?.refund) {
       throw new BadRequestException(
-        `${adapter?.name ?? 'This gateway'} refunds cannot be sent from OrderRestro. Refund it in the provider dashboard and record it as an Other refund.`,
+        `${adapter?.name ?? 'This gateway'} refunds cannot be sent from Maxora POS. Refund it in the provider dashboard and record it as an Other refund.`,
       );
     }
     const amountMinor = toMinor(input.amount, p.currency);
@@ -577,7 +577,7 @@ export class GatewayPaymentsService {
         data: {
           status: 'NEEDS_REVIEW',
           providerRefundId,
-          note: `Refunded at ${adapter.name} but could not be recorded in OrderRestro: ${(e as Error).message}`.slice(
+          note: `Refunded at ${adapter.name} but could not be recorded in Maxora POS: ${(e as Error).message}`.slice(
             0,
             300,
           ),

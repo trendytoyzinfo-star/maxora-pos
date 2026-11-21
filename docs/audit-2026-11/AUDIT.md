@@ -1,4 +1,4 @@
-# OrderRestro audit, 2026-11-13
+# Maxora POS audit, 2026-11-13
 
 Checked against a local scratch Postgres (never production). "Verified" means exercised through UI or API against the
 database; "read" means only read in code.

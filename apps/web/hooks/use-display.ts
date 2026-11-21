@@ -1,6 +1,6 @@
 "use client";
 
-import type { AdDto, TerminalDto } from "@nodedr-restaurant/types";
+import type { AdDto, TerminalDto } from "@maxora/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 

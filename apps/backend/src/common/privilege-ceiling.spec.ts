@@ -1,4 +1,4 @@
-import type { SessionUser } from '@nodedr-restaurant/types';
+import type { SessionUser } from '@maxora/types';
 import {
   assertMayGrantKeys,
   assertMayManageRole,

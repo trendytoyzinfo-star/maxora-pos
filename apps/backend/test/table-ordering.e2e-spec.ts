@@ -130,7 +130,7 @@ run('Table ordering, paging and customer display (e2e)', () => {
       req.on('data', (c) => (b += c));
       req.on('end', () => {
         hits.push({
-          sig: req.headers['x-orderrestro-signature'] as string,
+          sig: req.headers['x-maxora-signature'] as string,
           body: b,
         });
         res.statusCode = 200;

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import {
   permissionSatisfied,
   type SessionUser,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { allowedUnits } from '../modules/inventory/units';
 import { PrismaService } from '../prisma/prisma.service';
 import {

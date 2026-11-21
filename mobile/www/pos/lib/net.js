@@ -47,7 +47,7 @@ export async function request(base, method, path, body, { timeout = 15000 } = {}
   }
 }
 
-/** Is an OrderRestro server answering at this address? */
+/** Is an Maxora POS server answering at this address? */
 export async function reachable(base, timeout = 3500) {
   try {
     const r = await request(base, 'GET', '/api/v1/auth/setup-status', undefined, { timeout });
@@ -80,15 +80,15 @@ export async function pickServer(preferred) {
 
 /**
  * What the server says about itself: product, version, API level, capabilities.
- * Returns null when nothing OrderRestro answers. `ms` is the round-trip time.
+ * Returns null when nothing Maxora POS answers. `ms` is the round-trip time.
  */
 export async function serverInfo(base, timeout = 4000) {
   const t0 = Date.now();
   try {
     const r = await request(base, 'GET', '/api/v1/mobile/server-info', undefined, { timeout });
-    if (r.status === 200 && r.data && r.data.product === 'orderrestro') return { ...r.data, ms: Date.now() - t0, legacy: false };
-    // Servers older than this feature only have setup-status: still an OrderRestro server, but no capabilities.
-    if (await reachable(base, timeout)) return { product: 'orderrestro', version: 'unknown', apiVersion: 1, capabilities: {}, ms: Date.now() - t0, legacy: true };
+    if (r.status === 200 && r.data && r.data.product === 'maxora') return { ...r.data, ms: Date.now() - t0, legacy: false };
+    // Servers older than this feature only have setup-status: still an Maxora POS server, but no capabilities.
+    if (await reachable(base, timeout)) return { product: 'maxora', version: 'unknown', apiVersion: 1, capabilities: {}, ms: Date.now() - t0, legacy: true };
   } catch {
     /* fall through */
   }

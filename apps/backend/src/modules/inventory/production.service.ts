@@ -10,7 +10,7 @@ import type {
   CorrectProductionDto,
   ProductionEntryDto,
   ProductionLineDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { AuditService } from '../../audit/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { localDate } from '../../common/time';

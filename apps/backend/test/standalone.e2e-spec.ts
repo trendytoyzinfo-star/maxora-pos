@@ -382,7 +382,7 @@ run('Standalone mode (e2e)', () => {
       .body;
     expect(info).toEqual(
       expect.objectContaining({
-        product: 'orderrestro',
+        product: 'maxora',
         apiVersion: 2,
         version: expect.any(String),
       }),

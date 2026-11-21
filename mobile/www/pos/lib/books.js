@@ -256,7 +256,7 @@ export function expensesCsv(expenses) {
   return out.join('\r\n') + '\r\n';
 }
 
-export const BACKUP_FORMAT = 'orderrestro-standalone-backup';
+export const BACKUP_FORMAT = 'maxora-standalone-backup';
 
 /** Everything on the phone (never the password) as one JSON file. */
 export function backupJson(data, now = new Date()) {
@@ -269,9 +269,9 @@ export function parseBackup(text) {
   try {
     b = JSON.parse(text);
   } catch {
-    throw new Error('That file is not an OrderRestro backup.');
+    throw new Error('That file is not an Maxora POS backup.');
   }
-  if (!b || b.format !== BACKUP_FORMAT) throw new Error('That file is not an OrderRestro backup.');
+  if (!b || b.format !== BACKUP_FORMAT) throw new Error('That file is not an Maxora POS backup.');
   if (b.version !== 1) throw new Error('This backup was made by a newer version of the app. Update the app first.');
   const arr = (x) => (Array.isArray(x) ? x : []);
   if (!b.snapshot || !Array.isArray(b.snapshot.items)) throw new Error('The backup has no menu in it.');

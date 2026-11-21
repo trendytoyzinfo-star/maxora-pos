@@ -8,7 +8,7 @@ import { Prisma } from '@prisma/client';
 import type {
   LocationTransferDto,
   StockLocationDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { AuditService } from '../../audit/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toBaseQuantity } from './units';

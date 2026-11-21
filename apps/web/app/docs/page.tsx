@@ -4,40 +4,40 @@ import { DocPage, DocSection } from "@/components/marketing/doc-page";
 import { downloadHref } from "@/lib/downloads";
 
 export const metadata: Metadata = {
-  title: "Documentation — OrderRestro",
-  description: "API & MCP, accessibility, and India compliance docs for a self-hosted OrderRestro instance.",
+  title: "Documentation — Maxora POS",
+  description: "API & MCP, accessibility, and India compliance docs for a self-hosted Maxora POS instance.",
 };
 
 const docs = [
   {
     href: "/docs/api",
     title: "API & MCP",
-    description: "Connect an AI client via MCP, or use OrderRestro as a backend for your own website.",
+    description: "Connect an AI client via MCP, or use Maxora POS as a backend for your own website.",
   },
   {
     href: "/docs/accessibility",
     title: "Accessibility",
-    description: "How OrderRestro is built to work with keyboards, screen readers, and reduced motion.",
+    description: "How Maxora POS is built to work with keyboards, screen readers, and reduced motion.",
   },
   {
     href: "/docs/compliance-india",
     title: "India compliance",
-    description: "GST, receipts, and data-residency notes for running OrderRestro in India.",
+    description: "GST, receipts, and data-residency notes for running Maxora POS in India.",
   },
 ];
 
 export default function DocsIndexPage() {
   return (
     <DocPage title="Documentation" updated="30 September 2026">
-      <DocSection heading="Watch OrderRestro in action">
+      <DocSection heading="Watch Maxora POS in action">
         <p className="mb-4">
-          Watch the OrderRestro video walkthrough to see the product in action.
+          Watch the Maxora POS video walkthrough to see the product in action.
         </p>
         <div className="aspect-video overflow-hidden rounded-xl border border-border/60">
           <iframe
             className="h-full w-full"
             src="https://www.youtube.com/embed/mlcK4KAXVgU"
-            title="OrderRestro video walkthrough"
+            title="Maxora POS video walkthrough"
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

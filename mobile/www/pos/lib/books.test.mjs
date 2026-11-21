@@ -87,9 +87,9 @@ test('backup round trip and refusal of foreign files', () => {
   const back = parseBackup(backupJson({ snapshot: snap, sales: [sale()], expenses: [] }, NOW));
   assert.equal(back.sales.length, 1);
   assert.deepEqual(back.refunds, []);
-  assert.throws(() => parseBackup('nope'), /not an OrderRestro backup/);
-  assert.throws(() => parseBackup('{"format":"x"}'), /not an OrderRestro backup/);
-  assert.throws(() => parseBackup(JSON.stringify({ format: 'orderrestro-standalone-backup', version: 2, snapshot: snap })), /newer version/);
+  assert.throws(() => parseBackup('nope'), /not an Maxora POS backup/);
+  assert.throws(() => parseBackup('{"format":"x"}'), /not an Maxora POS backup/);
+  assert.throws(() => parseBackup(JSON.stringify({ format: 'maxora-standalone-backup', version: 2, snapshot: snap })), /newer version/);
   assert.equal(today(NOW), '2026-11-08');
 });
 

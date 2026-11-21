@@ -10,7 +10,7 @@ import {
   type AdDto,
   type DisplayStateDto,
   type TerminalDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { PrismaService } from '../../prisma/prisma.service';
 
 const token = () => randomBytes(18).toString('base64url');

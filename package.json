@@ -1,18 +1,18 @@
 {
-  "name": "nodedr-orderrestro",
+  "name": "maxora-pos",
   "private": true,
   "version": "0.1.0",
-  "description": "Nodedr OrderRestro — offline-first Restaurant Management System",
+  "description": "Maxora POS — offline-first Restaurant Management System",
   "author": "Raktim Ranjit <mail@raktimranjit.com> (https://github.com/Raktim94)",
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Raktim94/nodedr-restaurant-pos.git"
+    "url": "https://github.com/trendytoyzinfo-star/maxora-pos.git"
   },
   "bugs": {
-    "url": "https://github.com/Raktim94/nodedr-restaurant-pos/issues"
+    "url": "https://github.com/trendytoyzinfo-star/maxora-pos/issues"
   },
-  "homepage": "https://orderrestro.nodedr.com/",
+  "homepage": "https://maxora.example.com/",
   "keywords": [
     "restaurant-management",
     "restaurant-pos",

@@ -31,3 +31,12 @@ BSD-3-Clause OR GPL-2.0) are used under their permissive option.
 Everything above is compatible with distributing this program under AGPL-3.0.
 Re-run a licence scan before each release; this list is not a substitute for
 it.
+
+MAXORA POS MODIFICATIONS
+Maxora POS is a modified fork of the project above and is not the official
+Nodedr release. Changes made on 2026-11-22 include: product renamed to
+"Maxora POS", new logo, icons and splash screens, renamed packages (@maxora/*),
+Android application id (com.maxora.pos), container, cookie, header and
+environment-variable names, and the source link now points to
+https://github.com/trendytoyzinfo-star/maxora-pos. The original copyright
+notices above are kept unchanged.

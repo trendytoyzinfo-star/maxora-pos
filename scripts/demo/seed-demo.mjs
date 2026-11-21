@@ -2,8 +2,8 @@
 // setup, so every feature shown on the website has something to look at. Safe to run again (it skips what exists).
 //
 // Run it inside the backend container (or any place with the backend's node_modules and DATABASE_URL), with the demo
-// server running (DEMO_MODE=true, DEMO_USER_EMAIL=demo@orderrestro.nodedr.com):
-//   cat seed-demo.mjs | docker exec -i orderrestro-demo-backend node --input-type=module -
+// server running (DEMO_MODE=true, DEMO_USER_EMAIL=demo@maxora.example.com):
+//   cat seed-demo.mjs | docker exec -i maxora-demo-backend node --input-type=module -
 // It never touches any other database: it only talks to http://localhost:$PORT and to DATABASE_URL.
 import { createRequire } from 'node:module';
 import { randomBytes } from 'node:crypto';
@@ -13,7 +13,7 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
 const prisma = new PrismaClient();
 const BASE = `http://localhost:${process.env.PORT || 4000}/api/v1`;
-const EMAIL = process.env.DEMO_USER_EMAIL || 'demo@orderrestro.nodedr.com';
+const EMAIL = process.env.DEMO_USER_EMAIL || 'demo@maxora.example.com';
 
 const log = (m) => console.log('  ' + m);
 const must = async (label, p) => { try { return await p; } catch (e) { console.log(`  ! ${label}: ${e.message}`); return null; } };

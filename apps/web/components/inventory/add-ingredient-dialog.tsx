@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "@/lib/toast";
-import type { IngredientUnit } from "@nodedr-restaurant/types";
+import type { IngredientUnit } from "@maxora/types";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";

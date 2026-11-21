@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="apps/web/public/logo.png" alt="OrderRestro logo" width="120">
+<img src="apps/web/public/logo.png" alt="Maxora POS logo" width="120">
 
-<img src="docs/orderrestro-cover.jpg" alt="Illustrative evening scene in an independent restaurant" width="100%">
+<img src="docs/maxora-cover.jpg" alt="Illustrative evening scene in an independent restaurant" width="100%">
 
 **Open-source, self-hosted restaurant POS & management system** — billing
 with **UPI QR payments**, tables, kitchen display (KDS), reservations,
@@ -21,22 +21,22 @@ dine-in, takeaway, delivery and kitchen operations.
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![Status](https://img.shields.io/badge/status-active%20development-orange.svg)](./ROADMAP.md)
 
-Developed by [NodeDR Infotech Private Limited](https://www.nodedr.com/)
+Developed by [Maxora Infotech Private Limited](https://maxora.example.com/)
 
-**[Try OrderRestro](https://orderrestro.nodedr.com/)** · **[Case study](https://www.raktimranjit.com/projects/orderrestro)** · **[Maintainer: Raktim Ranjit](https://www.raktimranjit.com/)**
+**[Try Maxora POS](https://maxora.example.com/)** · **[Case study](https://www.raktimranjit.com/projects/maxora)** · **[Maintainer: Raktim Ranjit](https://www.raktimranjit.com/)**
 
 <p align="center">
-  <a href="https://orderrestro.nodedr.com/"><img src="https://img.shields.io/badge/Go%20to%20the%20OrderRestro%20website-orderrestro.nodedr.com-E0234E?style=for-the-badge" alt="Go to the OrderRestro website"></a>
-  <a href="https://play.google.com/store/apps/details?id=com.nodedr.orderrestro&pcampaignid=web_share"><img src="https://img.shields.io/badge/Get%20it%20on-Google%20Play-3DDC84?style=for-the-badge&logo=googleplay&logoColor=white" alt="Get OrderRestro on Google Play"></a>
+  <a href="https://maxora.example.com/"><img src="https://img.shields.io/badge/Go%20to%20the%20Maxora POS%20website-maxora.example.com-E0234E?style=for-the-badge" alt="Go to the Maxora POS website"></a>
+  <a href="https://play.google.com/store/apps/details?id=com.maxora.pos&pcampaignid=web_share"><img src="https://img.shields.io/badge/Get%20it%20on-Google%20Play-3DDC84?style=for-the-badge&logo=googleplay&logoColor=white" alt="Get Maxora POS on Google Play"></a>
 </p>
 
 <p align="center">
-  <img src="docs/assets/hero-animated.svg" alt="Nodedr OrderRestro: animated overview with an illustrative sample screen" width="100%">
+  <img src="docs/assets/hero-animated.svg" alt="Maxora POS: animated overview with an illustrative sample screen" width="100%">
 </p>
 
 
 [Quick Start](#quick-start) ·
-[How to use](#how-to-use-orderrestro) ·
+[How to use](#how-to-use-maxora) ·
 [Full tutorial](./TUTORIAL.md) ·
 [Features](#features) ·
 [Screenshots](#screenshots) ·
@@ -50,17 +50,17 @@ Developed by [NodeDR Infotech Private Limited](https://www.nodedr.com/)
 
 ## Integrate with AI Coding Agents
 
-Building a restaurant website or app on OrderRestro? Point your coding agent at [`prompts/AI_INTEGRATION_PROMPT.md`](prompts/AI_INTEGRATION_PROMPT.md) (verified endpoints, scopes, server-side Next.js pattern, MCP setup, test checklist). See also [`AGENTS.md`](AGENTS.md) and [`llms.txt`](llms.txt).
+Building a restaurant website or app on Maxora POS? Point your coding agent at [`prompts/AI_INTEGRATION_PROMPT.md`](prompts/AI_INTEGRATION_PROMPT.md) (verified endpoints, scopes, server-side Next.js pattern, MCP setup, test checklist). See also [`AGENTS.md`](AGENTS.md) and [`llms.txt`](llms.txt).
 
-## Watch OrderRestro on YouTube
+## Watch Maxora POS on YouTube
 
-[![Watch the 17-minute OrderRestro walkthrough](https://img.youtube.com/vi/L7nXdduvExc/hqdefault.jpg)](https://youtu.be/L7nXdduvExc)
+[![Watch the 17-minute Maxora POS walkthrough](https://img.youtube.com/vi/L7nXdduvExc/hqdefault.jpg)](https://youtu.be/L7nXdduvExc)
 
 See the full walkthrough, from setup and menu pricing to orders, kitchen service, and reports.
 
 ## What this is
 
-**Nodedr OrderRestro** is a purpose-built, offline-first Restaurant
+**Maxora POS** is a purpose-built, offline-first Restaurant
 Management System for restaurants, cafés, coffee shops, bakeries, fast
 food, fine dining, bars, food courts, cloud kitchens, and multi-branch
 chains. The whole stack — Postgres, API, and web app — runs on one local
@@ -202,7 +202,7 @@ ordering page and staff sidebar.
 - **Customer-facing screen with adverts**, **paging buzzers**, a **hardware simulator**, saved **floor layouts**, **stock areas**, **stock take** and **shopping list**, and phones that work **offline** for sales, production, waste, stock receipts and clock in/out.
 - **Collapsible navigation**.
 
-## Why OrderRestro
+## Why Maxora POS
 
 - **UPI-first checkout (India)** — pick UPI and a QR for the exact bill
   amount appears at the till *and* on the customer-facing screen; a
@@ -217,7 +217,7 @@ ordering page and staff sidebar.
 - **India-ready** — GST (inclusive or exclusive), UPI, ₹ formatting, plus
   US sales tax, EU VAT and Spanish IVA for other markets.
 
-## How to use OrderRestro
+## How to use Maxora POS
 
 Start with the [screenshot-guided tutorial](./TUTORIAL.md) for the full
 first-run walkthrough. It covers sign-up, setup, daily service, and the
@@ -242,7 +242,7 @@ management tools with **56 screenshots of the app**.
 <p align="center">
   <a href="./TUTORIAL.md"><strong>Open the complete tutorial →</strong></a>
   &nbsp; · &nbsp;
-  <a href="./docs/orderrestro-user-manual.pdf">Download the user manual</a>
+  <a href="./docs/maxora-user-manual.pdf">Download the user manual</a>
 </p>
 
 ## Screenshots
@@ -270,7 +270,7 @@ management tools with **56 screenshots of the app**.
 ## FAQ
 
 **Is there a free, open-source restaurant POS I can self-host?**
-Yes — OrderRestro is AGPL-3.0 and installs with `docker compose up`, or as
+Yes — Maxora POS is AGPL-3.0 and installs with `docker compose up`, or as
 a one-click app on CasaOS / ZimaOS.
 
 **Does it support UPI payments and GST billing?**
@@ -291,7 +291,7 @@ Yes — every report exports to Excel, PDF or CSV, and can be emailed on a
 daily, weekly or monthly schedule through your own SMTP server.
 
 **What is not built yet?** Gateways beyond Razorpay, Stripe and Cashfree
-(and refunds from inside OrderRestro), direct
+(and refunds from inside Maxora POS), direct
 accounting-software and delivery-platform connectors, weighing-scale and
 label printers, a SQLite edition and native installers. The
 [roadmap](./ROADMAP.md) is explicit about what is done and what is not.
@@ -331,12 +331,12 @@ Postgres over the originally-specced SQLite — is in
 ### One-line install (Ubuntu / Debian, amd64 and arm64)
 
 ```bash
-curl -fsSL https://orderrestro.nodedr.com/install-linux.sh | sudo bash
+curl -fsSL https://maxora.example.com/install-linux.sh | sudo bash
 ```
 
-Installs the `nodedr-orderrestro` .deb (runs in Docker; installs Docker if
-missing). OrderRestro opens on port 1995. Direct downloads and checksums are on
-the [releases page](https://github.com/Raktim94/nodedr-restaurant-pos/releases/latest).
+Installs the `maxora-pos` .deb (runs in Docker; installs Docker if
+missing). Maxora POS opens on port 1995. Direct downloads and checksums are on
+the [releases page](https://github.com/trendytoyzinfo-star/maxora-pos/releases/latest).
 
 ### Installing Docker
 
@@ -378,7 +378,7 @@ already bundled, which is all this project requires.
 ### One-click install
 
 ```bash
-git clone https://github.com/Raktim94/nodedr-restaurant-pos.git && cd nodedr-restaurant-pos && ./install.sh
+git clone https://github.com/trendytoyzinfo-star/maxora-pos.git && cd maxora-pos && ./install.sh
 ```
 
 [`install.sh`](install.sh) generates a `.env` with random secrets (only if
@@ -399,11 +399,11 @@ If you'd rather run each step yourself (e.g. to set your own secrets instead
 of generated ones):
 
 ```bash
-git clone https://github.com/Raktim94/nodedr-restaurant-pos.git
-cd nodedr-restaurant-pos
+git clone https://github.com/trendytoyzinfo-star/maxora-pos.git
+cd maxora-pos
 cp .env.example .env        # edit JWT_SECRET / POSTGRES_PASSWORD for anything beyond local dev
 docker compose up -d --build
-docker exec nodedr-restaurant-backend npx ts-node prisma/seed.ts   # optional: demo data + login; upsert-based, safe to re-run
+docker exec maxora-backend npx ts-node prisma/seed.ts   # optional: demo data + login; upsert-based, safe to re-run
 ```
 
 ### Local dev (no Docker for the apps)
@@ -415,7 +415,7 @@ service from Docker Compose).
 pnpm install
 docker compose up -d postgres
 cp apps/backend/.env.example apps/backend/.env   # point DATABASE_URL at your Postgres
-pnpm --filter @nodedr-restaurant/types build
+pnpm --filter @maxora/types build
 cd apps/backend && npx prisma migrate dev && npx ts-node prisma/seed.ts && cd ../..
 pnpm dev   # runs backend (:4001) and web (:1995) together via Turborepo
 ```
@@ -449,7 +449,7 @@ docker compose up -d --build
 ```bash
 git pull
 pnpm install
-pnpm --filter @nodedr-restaurant/types build
+pnpm --filter @maxora/types build
 cd apps/backend && npx prisma migrate dev && cd ../..
 pnpm dev
 ```
@@ -544,13 +544,13 @@ See [`MAINTAINERS.md`](./MAINTAINERS.md) for project maintainers.
 ---
 
 <div align="center">
-<img src="apps/web/public/logo.png" alt="Nodedr OrderRestro" width="72">
+<img src="apps/web/public/logo.png" alt="Maxora POS" width="72">
 </div>
 
 
 ## Case study
 
-Read the [OrderRestro case study](https://www.raktimranjit.com/projects/orderrestro) for the product background and design decisions.
+Read the [Maxora POS case study](https://www.raktimranjit.com/projects/maxora) for the product background and design decisions.
 
 Maintainer: [Raktim Ranjit](https://www.raktimranjit.com/)
 
@@ -564,4 +564,4 @@ offline-first POS, NestJS, Next.js, PostgreSQL, Prisma, CasaOS, ZimaOS.</sub>
 
 ## Commercial licence
 
-Licensed under the AGPL-3.0. A [commercial licence](COMMERCIAL-LICENSE.md) is available on request for use without the AGPL obligations. The NodeDR OrderRestro name and logo are not covered by the AGPL.
+Licensed under the AGPL-3.0. A [commercial licence](COMMERCIAL-LICENSE.md) is available on request for use without the AGPL obligations. The Maxora POS name and logo are not covered by the AGPL.

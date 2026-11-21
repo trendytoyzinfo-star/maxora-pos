@@ -4,8 +4,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 set -a; . ./.env; set +a
-IMG=ghcr.io/raktim94/nodedr-restaurant-pos
-N=orderrestro-demo
+IMG=ghcr.io/trendytoyzinfo-star/maxora-pos
+N=maxora-demo
 docker network inspect $N >/dev/null 2>&1 || docker network create $N >/dev/null
 docker volume inspect $N-pg >/dev/null 2>&1 || docker volume create $N-pg >/dev/null
 docker rm -f $N-web $N-backend >/dev/null 2>&1 || true
@@ -18,7 +18,7 @@ docker run -d --name $N-backend --restart unless-stopped --network $N --network-
   -e DATABASE_URL="postgresql://demo:${DEMO_DB_PASSWORD}@$N-db:5432/demo" -e JWT_SECRET="${DEMO_JWT_SECRET}" \
   -e JWT_EXPIRES_IN=12h -e PORT=4000 -e CORS_ORIGIN="$DEMO_ORIGIN" -e COOKIE_SECURE="${DEMO_COOKIE_SECURE:-true}" \
   -e TRUST_PROXY=1 -e UPLOADS_DIR=/data/uploads \
-  -e DEMO_MODE=true -e DEMO_USER_EMAIL=demo@orderrestro.nodedr.com -e DEMO_RESET_HOURS=3 \
+  -e DEMO_MODE=true -e DEMO_USER_EMAIL=demo@maxora.example.com -e DEMO_RESET_HOURS=3 \
   $IMG-backend:"$APP_VERSION" >/dev/null
 docker run -d --name $N-web --restart unless-stopped --network $N --memory 384m -p 127.0.0.1:19951:3000 \
   $IMG-web:"$APP_VERSION" >/dev/null

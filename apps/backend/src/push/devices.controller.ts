@@ -42,13 +42,13 @@ export class DevicesController {
   }
 
   // Public: who is answering. The app calls this when pairing and on every
-  // connection check, to confirm it reached an OrderRestro server, show its
+  // connection check, to confirm it reached an Maxora POS server, show its
   // version and decide which features it may offer. Nothing about the
   // restaurant itself is revealed here.
   @Get('mobile/server-info')
   serverInfo() {
     return {
-      product: 'orderrestro',
+      product: 'maxora',
       version:
         (process.env.APP_VERSION ?? '').trim().replace(/^v/i, '') || 'dev',
       // Bumped when the phone/server contract changes in a way old apps must know about.

@@ -1,6 +1,6 @@
 "use client";
 
-import type { IngredientUnit } from "@nodedr-restaurant/types";
+import type { IngredientUnit } from "@maxora/types";
 import { useMemo, useRef, useState } from "react";
 import { VoucherAddItemDialog } from "@/components/inventory/voucher-add-item-dialog";
 import { ItemCombobox, MENU_PREFIX } from "@/components/inventory/item-combobox";

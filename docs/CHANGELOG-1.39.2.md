@@ -1,4 +1,4 @@
-# OrderRestro 1.39.2
+# Maxora POS 1.39.2
 
 Includes everything in 1.39.1 (Stock Journal Manager role, producing menu items from the Stock Journal).
 

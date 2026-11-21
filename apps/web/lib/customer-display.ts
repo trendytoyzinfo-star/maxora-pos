@@ -5,7 +5,7 @@
 // The server leg never blocks or fails the staff screen: if it cannot be reached the sale carries on and the
 // customer screen simply keeps its last picture until the connection is back.
 import { api } from "@/lib/api";
-import type { DisplayStateDto } from "@nodedr-restaurant/types";
+import type { DisplayStateDto } from "@maxora/types";
 
 export interface DisplayLine {
   name: string;
@@ -15,8 +15,8 @@ export interface DisplayLine {
 
 export type DisplayState = DisplayStateDto;
 
-const CHANNEL = "orderrestro-customer-display";
-const KEY = "orderrestro.displayTerminal";
+const CHANNEL = "maxora-customer-display";
+const KEY = "maxora.displayTerminal";
 
 export function getDisplayTerminal(): { id: string; branchId: string; name?: string } | null {
   try {

@@ -3,7 +3,7 @@ import {
   PERMISSIONS,
   permissionSatisfied,
   STAFF_ROLES,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 
 describe('Stock Journal manager role', () => {
   const held = DEFAULT_ROLE_PERMISSIONS.STOCK_JOURNAL_MANAGER;

@@ -11,7 +11,7 @@ const { chromium } = require(process.argv[2] || 'playwright-core');
 
 const HERE = __dirname;
 const OUT = path.join(HERE, '..', 'screenshots', 'play-1.39');
-const SERVER = 'With your OrderRestro server';
+const SERVER = 'With your Maxora POS server';
 
 const SHOTS = [
   { file: '01-take-orders', img: 'phone-sell.png', top: 'Take orders', big: 'in seconds', sub: 'Tap dishes, pick the table, send the KOT.' },
@@ -55,7 +55,7 @@ p b{color:#ffd9a8;font-weight:900}
 .phone{position:absolute;right:70px;top:46px;width:300px;border-radius:40px 40px 0 0;background:#141414;padding:10px 10px 0;box-shadow:0 24px 50px rgba(0,0,0,.45)}
 .phone img{display:block;width:100%;border-radius:31px 31px 0 0}
 </style></head><body>
-<div class="t"><img src="file://${path.join(HERE, '..', '..', 'www', 'assets', 'logo.png')}" alt=""><h1>OrderRestro</h1>
+<div class="t"><img src="file://${path.join(HERE, '..', '..', 'www', 'assets', 'logo.png')}" alt=""><h1>Maxora POS</h1>
 <p>Restaurant billing, KOT and tables on your phone. <b>Works with no internet.</b></p></div>
 <div class="phone"><img src="file://${path.join(HERE, 'captures', 'phone-sell.png')}"></div></body></html>`;
 

@@ -1,6 +1,6 @@
 # Mobile app: failure modes and recovery
 
-How the OrderRestro app behaves when things go wrong, what staff see, and how they recover.
+How the Maxora POS app behaves when things go wrong, what staff see, and how they recover.
 Two modes are covered: **server-linked** (the app shows the restaurant server's web app) and the
 **phone POS** (`mobile/www/pos`, works with no server; sales sync later through `lib/journal.js`).
 

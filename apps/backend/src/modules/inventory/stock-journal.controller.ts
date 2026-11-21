@@ -52,7 +52,7 @@ import {
   type ProductionEntryDto,
   type SessionUser,
   type WasteEntryDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { z } from 'zod';
 import { Auth } from '../../common/decorators/auth.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';

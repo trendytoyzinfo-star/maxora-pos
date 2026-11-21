@@ -1,6 +1,6 @@
 {
-  "appId": "com.nodedr.orderrestro",
-  "appName": "OrderRestro",
+  "appId": "com.maxora.pos",
+  "appName": "Maxora POS",
   "webDir": "www",
   "backgroundColor": "#ffffff",
   "server": {

@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import type { SessionUser } from '@nodedr-restaurant/types';
+import type { SessionUser } from '@maxora/types';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import {
   effectivePermissions,
@@ -34,7 +34,7 @@ export function isRevoked(
 const cookieExtractor = (req: {
   cookies?: Record<string, string>;
 }): string | null => {
-  return req.cookies?.['nodedr_session'] ?? null;
+  return req.cookies?.['maxora_session'] ?? null;
 };
 
 @Injectable()

@@ -9,7 +9,7 @@ import {
   TAX_REGIMES,
   type TaxMode,
   type TaxRegime,
-} from "@nodedr-restaurant/types";
+} from "@maxora/types";
 import { KioskCard } from "@/components/settings/kiosk-card";
 import { MobileAppCard } from "@/components/settings/mobile-app-card";
 import { PrinterDiagnosticsCard } from "@/components/settings/printer-diagnostics-card";
@@ -331,7 +331,7 @@ function GeneralSettingsForm({
                 </button>
               )}
               <p className="text-xs text-muted-foreground">
-                Shows in the app sidebar and login screen instead of the OrderRestro mark.
+                Shows in the app sidebar and login screen instead of the Maxora POS mark.
                 Square, at least 256×256px, PNG with a transparent background works best.
               </p>
             </div>
@@ -693,15 +693,15 @@ function GeneralSettingsForm({
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        Nodedr OrderRestro is free software under the GNU AGPL-3.0. The source code of the version
+        Maxora POS is free software under the GNU AGPL-3.0. The source code of the version
         you are using is available to every user of this service at{" "}
         <a
           className="underline"
-          href="https://github.com/Raktim94/nodedr-restaurant-pos"
+          href="https://github.com/trendytoyzinfo-star/maxora-pos"
           target="_blank"
           rel="noopener noreferrer"
         >
-          github.com/Raktim94/nodedr-restaurant-pos
+          github.com/trendytoyzinfo-star/maxora-pos
         </a>
         .
       </p>

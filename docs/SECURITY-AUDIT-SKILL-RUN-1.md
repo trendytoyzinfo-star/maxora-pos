@@ -1,4 +1,4 @@
-# Security audit report: OrderRestro (nodedr-restaurant-pos)
+# Security audit report: Maxora POS (maxora-pos)
 
 **Reviewed commit:** `b9a47cdaca9c3982207755acf9c7ad9d3afaf94a`. **Profile:** quick, scoped, two hunting waves (8 + 6 units, 7 hunters, 1 critic). **Method:** source review by isolated read-only hunters; the parent validated each candidate with a regression test that fails on the old code. **Partial coverage, not a clean bill of health.**
 

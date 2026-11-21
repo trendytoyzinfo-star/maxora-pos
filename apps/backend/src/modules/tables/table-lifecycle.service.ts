@@ -4,7 +4,7 @@ import {
   deriveTableState,
   type TableLifecycleFacts,
   type TableLifecycleState,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { PrismaService } from '../../prisma/prisma.service';
 
 const SETTLED_WINDOW_MS = 15 * 60_000;
@@ -12,7 +12,7 @@ const IN_FLIGHT_MS = 30 * 60_000;
 
 /**
  * The live table board. Every state is derived from stored facts (sessions, orders, kitchen tickets, payments, calls)
- * by the shared state machine in @nodedr-restaurant/types; nothing here is typed in by hand and nothing is stored,
+ * by the shared state machine in @maxora/types; nothing here is typed in by hand and nothing is stored,
  * so the board cannot drift from the orders. Batched queries: a floor of 100 tables costs a fixed handful of reads.
  */
 @Injectable()

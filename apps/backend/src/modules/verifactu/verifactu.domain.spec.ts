@@ -17,11 +17,11 @@ import {
 } from './verifactu.domain';
 
 const sys: SystemInfo = {
-  producerName: 'NODEDR INFOTECH PRIVATE LIMITED',
+  producerName: 'MAXORA INFOTECH PRIVATE LIMITED',
   producerCountry: 'IN',
   producerIdType: '04',
   producerId: 'U00000AA0000AAA000000',
-  systemName: 'OrderRestro',
+  systemName: 'Maxora POS',
   systemId: 'OR',
   version: '1.0.0',
   installationNumber: 'inst-1',

@@ -1,4 +1,4 @@
-# OrderRestro 1.40.0
+# Maxora POS 1.40.0
 
 - **Stock Journal: recipes per product.** Choose the product first; its saved recipes appear. "No saved recipes for this product yet" shows only when the server returned none for that product (a failed or slow request says so instead). *Save as recipe* keeps the ingredients as a template and never moves stock; *Save draft* never moves stock; *Post* records the movement once.
 - **Drafts can be reopened.** Production drafts can be edited, posted or deleted from the journal. A posted voucher is never edited: Correct (reverse and replace) or Reverse.

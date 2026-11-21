@@ -5,7 +5,7 @@ import {
   deriveTableState,
   mayCloseSession,
   type TableLifecycleFacts,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 
 const idle: TableLifecycleFacts = {
   sessionActive: false,

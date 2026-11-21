@@ -8,7 +8,7 @@ import type {
   CreateRoleDto,
   SessionUser,
   UpdateRoleDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { AuditService } from '../audit/audit.service';
 import {
   assertMayGrantKeys,

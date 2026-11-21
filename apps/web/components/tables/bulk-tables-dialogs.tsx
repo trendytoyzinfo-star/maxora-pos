@@ -1,6 +1,6 @@
 "use client";
 
-import { generateTableNumbers, TABLE_SHAPES, type TableShape } from "@nodedr-restaurant/types";
+import { generateTableNumbers, TABLE_SHAPES, type TableShape } from "@maxora/types";
 import { useState } from "react";
 import { selectClass } from "@/components/inventory/production-entry-dialog";
 import { Button } from "@/components/ui/button";

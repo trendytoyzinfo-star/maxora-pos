@@ -23,7 +23,7 @@ export interface OutboxItem {
   meta?: { kind: "kot-status"; id: string; status: string } | { kind: "kot-priority"; id: string; isPriority: boolean };
 }
 
-const STORE = "orderrestro.outbox.v1";
+const STORE = "maxora.outbox.v1";
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((l) => l());
 

@@ -3,7 +3,7 @@ import {
   DEFAULT_ROLE_PERMISSIONS,
   PERMISSIONS,
   type StaffRole,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { PrismaService } from '../prisma/prisma.service';
 
 // Roles this deep are meant to always hold every permission that exists —

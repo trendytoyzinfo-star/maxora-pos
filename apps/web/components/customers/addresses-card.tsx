@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCustomerAddress } from "@nodedr-restaurant/types";
+import { formatCustomerAddress } from "@maxora/types";
 import { MapPin, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";

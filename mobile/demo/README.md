@@ -1,6 +1,6 @@
 # Review demo server
 
-A small, throwaway OrderRestro for App Store and Play reviewers: sample data, a manager login, a rider login, reset with `reset.sh`. It holds nothing real.
+A small, throwaway Maxora POS for App Store and Play reviewers: sample data, a manager login, a rider login, reset with `reset.sh`. It holds nothing real.
 
 ## What is here
 
@@ -16,7 +16,7 @@ The host, hostname and reviewer credentials are kept outside the repo (maintaine
 ## Deploy
 
 ```bash
-mkdir -p ~/orderrestro-demo && cd ~/orderrestro-demo
+mkdir -p ~/maxora-demo && cd ~/maxora-demo
 # copy docker-compose.yml, reset.sh and demo-seed.sql here
 cat > .env <<ENV            # chmod 600
 DEMO_DB_PASSWORD=$(openssl rand -hex 16)
@@ -33,7 +33,7 @@ Point a public hostname (the private demo hostname) at `http://127.0.0.1:19951` 
 
 ## Reviewer login
 
-`reset.sh` re-applies the reviewer passwords after every reset: it copies `reviewer-credentials.txt` (the same two lines as `~/orderrestro-signing/demo/credentials.txt`, mode 600, never committed) and `reviewer-pw.cjs` into the backend container and runs it. Without this, a reset restores the dump's older passwords and review logins fail.
+`reset.sh` re-applies the reviewer passwords after every reset: it copies `reviewer-credentials.txt` (the same two lines as `~/maxora-signing/demo/credentials.txt`, mode 600, never committed) and `reviewer-pw.cjs` into the backend container and runs it. Without this, a reset restores the dump's older passwords and review logins fail.
 
 This server is for reviewers only. It is deliberately not linked from the website or the README.
 

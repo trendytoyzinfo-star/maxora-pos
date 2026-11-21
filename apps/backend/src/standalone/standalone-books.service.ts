@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import type { SessionUser } from '@nodedr-restaurant/types';
+import type { SessionUser } from '@maxora/types';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrdersService } from '../modules/orders/orders.service';
 import type {

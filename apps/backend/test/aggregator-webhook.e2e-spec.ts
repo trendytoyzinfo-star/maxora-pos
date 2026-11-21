@@ -36,9 +36,9 @@ run('Aggregator webhook (e2e)', () => {
     return request(app.getHttpServer())
       .post(opts.path ?? url)
       .set('Content-Type', 'application/json')
-      .set('X-OrderRestro-Timestamp', ts)
+      .set('X-Maxora-Timestamp', ts)
       .set(
-        'X-OrderRestro-Signature',
+        'X-Maxora-Signature',
         opts.sig ?? signAggregatorBody(opts.secret ?? SECRET, ts, raw),
       )
       .send(raw);
@@ -162,8 +162,8 @@ run('Aggregator webhook (e2e)', () => {
     await request(app.getHttpServer())
       .post(url)
       .set('Content-Type', 'application/json')
-      .set('X-OrderRestro-Timestamp', ts)
-      .set('X-OrderRestro-Signature', sig)
+      .set('X-Maxora-Timestamp', ts)
+      .set('X-Maxora-Signature', sig)
       .send('{"event":"ping" }')
       .expect(401);
     expect(await status()).toBe('PENDING_CONFIGURATION');

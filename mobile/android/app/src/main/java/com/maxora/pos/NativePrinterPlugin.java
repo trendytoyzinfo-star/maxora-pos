@@ -1,4 +1,4 @@
-package com.nodedr.orderrestro;
+package com.maxora.pos;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -166,7 +166,7 @@ public class NativePrinterPlugin extends Plugin {
             call.reject("There is nothing to share.");
             return;
         }
-        final String name = call.getString("name", "orderrestro.txt").replaceAll("[^A-Za-z0-9._-]", "_");
+        final String name = call.getString("name", "maxora.txt").replaceAll("[^A-Za-z0-9._-]", "_");
         final String mime = call.getString("mime", "text/plain");
         try {
             java.io.File dir = new java.io.File(getContext().getCacheDir(), "exports");
@@ -191,7 +191,7 @@ public class NativePrinterPlugin extends Plugin {
     }
 
     /**
-     * Automatic backup: writes the file to Download/OrderRestro on the phone, where it survives the app being cleared
+     * Automatic backup: writes the file to Download/MaxoraPOS on the phone, where it survives the app being cleared
      * or uninstalled and can be copied off with any file manager. One file per day (the same name is replaced), and
      * only the newest `keep` automatic backups this app made are kept. Android 10+ uses MediaStore (no permission);
      * older phones keep it in the app's own Documents folder (removed with the app), and the reply says which.
@@ -203,8 +203,8 @@ public class NativePrinterPlugin extends Plugin {
             call.reject("There is nothing to save.");
             return;
         }
-        final String name = call.getString("name", "orderrestro-auto-backup.json").replaceAll("[^A-Za-z0-9._-]", "_");
-        final String prefix = call.getString("prefix", "orderrestro-auto-").replaceAll("[^A-Za-z0-9._-]", "_");
+        final String name = call.getString("name", "maxora-auto-backup.json").replaceAll("[^A-Za-z0-9._-]", "_");
+        final String prefix = call.getString("prefix", "maxora-auto-").replaceAll("[^A-Za-z0-9._-]", "_");
         final int keep = Math.max(1, call.getInt("keep", 7));
         final byte[] bytes = text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
         try {
@@ -212,7 +212,7 @@ public class NativePrinterPlugin extends Plugin {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 android.content.ContentResolver cr = getContext().getContentResolver();
                 android.net.Uri coll = android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI;
-                String folder = android.os.Environment.DIRECTORY_DOWNLOADS + "/OrderRestro/";
+                String folder = android.os.Environment.DIRECTORY_DOWNLOADS + "/Maxora POS/";
                 String[] cols = { android.provider.MediaStore.MediaColumns._ID, android.provider.MediaStore.MediaColumns.DISPLAY_NAME };
                 String where = android.provider.MediaStore.MediaColumns.RELATIVE_PATH + "=? AND " + android.provider.MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?";
                 // Same day again: replace that file instead of making "name (1).json".
@@ -239,7 +239,7 @@ public class NativePrinterPlugin extends Plugin {
                     while (c != null && c.moveToNext()) mine.add(c.getLong(0));
                 }
                 for (int i = keep; i < mine.size(); i++) cr.delete(android.content.ContentUris.withAppendedId(coll, mine.get(i)), null, null);
-                ret.put("location", "Download/OrderRestro/" + name);
+                ret.put("location", "Download/MaxoraPOS/" + name);
                 ret.put("survivesUninstall", true);
             } else {
                 java.io.File dir = new java.io.File(getContext().getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS), "backups");
@@ -264,7 +264,7 @@ public class NativePrinterPlugin extends Plugin {
     @PluginMethod
     public void printHtml(final PluginCall call) {
         final String html = call.getString("html");
-        final String name = call.getString("name", "OrderRestro");
+        final String name = call.getString("name", "Maxora POS");
         if (html == null || html.isEmpty()) {
             call.reject("Nothing to print.");
             return;

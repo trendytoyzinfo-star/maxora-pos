@@ -29,7 +29,7 @@ export class DemoGuardMiddleware implements NestMiddleware {
   constructor(private readonly jwt: JwtService) {}
   use(req: Request, res: Response, next: NextFunction) {
     if (!isDemo()) return next();
-    const raw = /(?:^|;\s*)nodedr_session=([^;]+)/.exec(
+    const raw = /(?:^|;\s*)maxora_session=([^;]+)/.exec(
       req.headers.cookie ?? '',
     )?.[1];
     if (!raw) return next();

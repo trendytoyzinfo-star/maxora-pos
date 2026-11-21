@@ -1,6 +1,6 @@
 # Small restaurant mode
 
-OrderRestro is useful with nothing advanced switched on. Advanced features are separate switches, off by default, and never
+Maxora POS is useful with nothing advanced switched on. Advanced features are separate switches, off by default, and never
 required.
 
 ## Basic mode (default)

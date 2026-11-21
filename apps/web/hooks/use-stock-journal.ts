@@ -1,6 +1,6 @@
 "use client";
 
-import type { IngredientUnit, ProductionEntryDto, StockJournalDraftDto, StockJournalEntryDto, StockJournalType, WasteEntryDto, WasteReason } from "@nodedr-restaurant/types";
+import type { IngredientUnit, ProductionEntryDto, StockJournalDraftDto, StockJournalEntryDto, StockJournalType, WasteEntryDto, WasteReason } from "@maxora/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 

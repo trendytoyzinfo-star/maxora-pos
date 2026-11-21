@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Puts the public demo back to clean sample data. Runs on the demo server (plain docker, no compose).
-# Cron: 0 */3 * * * ~/orderrestro-demo/reset.sh >> ~/orderrestro-demo/reset.log 2>&1
+# Cron: 0 */3 * * * ~/maxora-demo/reset.sh >> ~/maxora-demo/reset.log 2>&1
 # Steps: stop app -> wipe the demo database -> restore the base dump -> start backend (applies migrations)
 #        -> wait until ready -> copy sample adverts -> run seed-demo.mjs -> start web.
 set -euo pipefail
 cd "$(dirname "$0")"
-N=orderrestro-demo
+N=maxora-demo
 docker stop $N-web $N-backend >/dev/null 2>&1 || true
 docker exec -i $N-db psql -U demo -d demo -q -v ON_ERROR_STOP=1 -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
 docker exec -i $N-db psql -U demo -d demo -q -v ON_ERROR_STOP=1 < demo-seed.sql

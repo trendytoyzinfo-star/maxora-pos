@@ -7,7 +7,7 @@ import type {
   JournalAdjustmentDto,
   StockReceiptDto,
   StockTakeDto,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuditService } from '../../audit/audit.service';

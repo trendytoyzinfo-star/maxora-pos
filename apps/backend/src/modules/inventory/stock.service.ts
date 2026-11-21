@@ -6,7 +6,7 @@ import {
   Optional,
 } from '@nestjs/common';
 import { Prisma, type StockMovementType } from '@prisma/client';
-import type { StockAdjustmentDto } from '@nodedr-restaurant/types';
+import type { StockAdjustmentDto } from '@maxora/types';
 import { PrismaService } from '../../prisma/prisma.service';
 import { round3 } from '../../common/money';
 import { NotificationsService } from '../../notifications/notifications.service';

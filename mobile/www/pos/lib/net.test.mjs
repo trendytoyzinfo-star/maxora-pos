@@ -17,7 +17,7 @@ const withFetch = async (fn, run) => {
 test('a current server reports version and capabilities', async () => {
   const f = async (url) =>
     url.endsWith('/server-info')
-      ? { status: 200, json: async () => ({ product: 'orderrestro', version: '1.23.0', apiVersion: 2, capabilities: { standaloneSalesSync: true } }) }
+      ? { status: 200, json: async () => ({ product: 'maxora', version: '1.23.0', apiVersion: 2, capabilities: { standaloneSalesSync: true } }) }
       : { status: 404, json: async () => ({}) };
   const i = await withFetch(f, () => serverInfo('http://x'));
   assert.equal(i.version, '1.23.0');
@@ -33,7 +33,7 @@ test('an older server without server-info is still recognised, flagged legacy', 
   assert.equal(i.apiVersion, 1);
 });
 
-test('something that is not OrderRestro, or nothing at all, gives null', async () => {
+test('something that is not Maxora POS, or nothing at all, gives null', async () => {
   assert.equal(await withFetch(reply(200, { hello: 1 }), () => serverInfo('http://x')), null);
   assert.equal(await withFetch(async () => { throw new Error('down'); }, () => serverInfo('http://x')), null);
 });

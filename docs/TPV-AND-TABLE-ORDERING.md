@@ -75,7 +75,7 @@ An order is **never marked paid** unless the gateway confirms it, or staff recor
 2. "Dual screen" is either two monitors on one computer (second window; works with no setup) or a separate tablet/PC on the
    same network (use the screen link and "Drive it from this till").
 3. The tablet that will be the customer screen can open a web page full screen and stay awake (kiosk mode).
-4. The shop has network access to the OrderRestro server (local network is enough; no internet is needed for ordering at the till).
+4. The shop has network access to the Maxora POS server (local network is enough; no internet is needed for ordering at the till).
 5. Buzzers are one per table, fixed to the table, and are *either* able to make HTTP requests *or* are driven by a base
    station that can receive an HTTP POST. If they are plain radio pagers with their own transmitter box, a small adapter is needed.
 6. Stripe is used through the existing gateway integration (Settings > Payments); the currency is the restaurant's currency (EUR for Spain).
@@ -124,4 +124,4 @@ a particular buzzer's radio behaves, printing, and any vendor SDK. **No hardware
 ## Buzzer integration contract (for whoever builds the device or base station)
 
 * Polling device: `GET /api/v1/public/buzzer/<token>/poll` about every 1.5 s returns `{call:{id,...}|null}`; the first poll that returns a call marks it delivered. `POST /api/v1/public/buzzer/<token>/ack` with `{callId}` acknowledges it.
-* Webhook base station: the server POSTs JSON `{event:"page", callId, buzzerId, buzzerNumber, tableId, label, sentAt}` with header `X-OrderRestro-Signature` = hex HMAC-SHA256 of the raw body with the secret set on the buzzer. Reply 2xx to accept; anything else is recorded as FAILED.
+* Webhook base station: the server POSTs JSON `{event:"page", callId, buzzerId, buzzerNumber, tableId, label, sentAt}` with header `X-Maxora-Signature` = hex HMAC-SHA256 of the raw body with the secret set on the buzzer. Reply 2xx to accept; anything else is recorded as FAILED.

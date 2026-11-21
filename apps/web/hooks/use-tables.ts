@@ -7,7 +7,7 @@ import type {
   TableLayoutUpdateDto,
   TableStatusDto,
   TableUpdateDto,
-} from "@nodedr-restaurant/types";
+} from "@maxora/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 

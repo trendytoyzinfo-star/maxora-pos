@@ -1,4 +1,4 @@
-// OrderRestro standalone POS. Opens with no connection, sells from the menu
+// Maxora POS standalone POS. Opens with no connection, sells from the menu
 // saved on this phone, prints, and sends the sales to the restaurant server
 // whenever it can. Plain DOM + modules: nothing here needs a build step.
 import { computeBill, round2, settle, upiLink } from './lib/bill.js';
@@ -350,7 +350,7 @@ function cancelOrderSheet() {
 }
 
 // ----------------------------------------------------------------- printing ---
-const PRINTER_KEY = 'orderrestro.btPrinter';
+const PRINTER_KEY = 'maxora.btPrinter';
 const savedPrinter = () => {
   try {
     return JSON.parse(localStorage.getItem(PRINTER_KEY) || 'null');
@@ -397,7 +397,7 @@ function choosePrinter() {
 
 async function printBluetooth(bytes) {
   const np = plugins().NativePrinter;
-  if (!np) return toast('Bluetooth printing works in the OrderRestro app.');
+  if (!np) return toast('Bluetooth printing works in the Maxora POS app.');
   let printer = savedPrinter();
   if (!printer) printer = await choosePrinter();
   if (!printer) return;
@@ -410,7 +410,7 @@ async function printBluetooth(bytes) {
 }
 
 async function printPdf(sale, opts) {
-  const upiSvg = opts.upiUri && window.OrderRestroQR ? await window.OrderRestroQR.svg(opts.upiUri, 240) : null;
+  const upiSvg = opts.upiUri && window.MaxoraQR ? await window.MaxoraQR.svg(opts.upiUri, 240) : null;
   const html = htmlReceipt(sale, S.snap, { provisional: opts.provisional, upiSvg });
   const np = plugins().NativePrinter;
   if (np) {
@@ -451,7 +451,7 @@ function renderWelcome() {
   $('app').innerHTML = `
   <div class="login" id="welcome">
     <img src="../assets/logo.png" alt="">
-    <h1 class="center">Welcome to OrderRestro</h1>
+    <h1 class="center">Welcome to Maxora POS</h1>
     <p class="mute center">How do you want to start? You can change your mind later: nothing you do now is lost.</p>
     <button class="btn block mt" id="w-phone" type="button">Start on this phone<br><small>Best if you have no server yet. Takes about a minute.</small></button>
     <ul class="mute" style="margin:.5rem 0 1rem;padding-left:1.1rem">
@@ -1321,9 +1321,9 @@ function openPay() {
     const st = settle(bill.total, tenders);
     const upiRow = rows.find((r) => r.method === 'UPI');
     let qr = '';
-    if (upiRow && S.snap.restaurant.upiVpa && window.OrderRestroQR) {
+    if (upiRow && S.snap.restaurant.upiVpa && window.MaxoraQR) {
       const amt = Number(upiRow.amount) || bill.total;
-      const svg = await window.OrderRestroQR.svg(upiLink({ vpa: S.snap.restaurant.upiVpa, name: S.snap.restaurant.upiPayeeName, amount: amt }), 240);
+      const svg = await window.MaxoraQR.svg(upiLink({ vpa: S.snap.restaurant.upiVpa, name: S.snap.restaurant.upiPayeeName, amount: amt }), 240);
       qr = `<div class="qr" aria-label="UPI QR code">${svg}</div><p class="center mute">Ask the guest to scan, then confirm below when the payment shows on your phone.</p>`;
     } else if (upiRow) qr = '<div class="note">No UPI id is set for this restaurant. Take the UPI payment on your own phone and note the reference.</div>';
     const root = $('sheet').firstElementChild;
@@ -1818,7 +1818,7 @@ async function collectSheet(saleId, message, draft = {}) {
 // the server (lib/journal.js, each safe to resend).
 const fmtDay = (key) => new Date(`${key}T12:00:00`).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
 const stamp = () => new Date().toISOString().slice(0, 10);
-const slug = () => String(S.snap.branch.name || 'orderrestro').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'orderrestro';
+const slug = () => String(S.snap.branch.name || 'maxora').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'maxora';
 const head = (title, back) => `<header><h2>${esc(title)}</h2><button class="x" data-close aria-label="Close">&times;</button></header>`;
 const METHOD_LABEL = { CASH: 'Cash', UPI: 'UPI', CARD: 'Card', OTHER: 'Other' };
 
@@ -2165,7 +2165,7 @@ async function settingsCard() {
   return `${refused.length ? `<div class="card mt"><h2 style="font-size:1.05rem">Refused by the server</h2>${refused
       .map((e) => `<div class="row"><div class="grow"><b>${BOOK_KIND[e.kind]}</b>${e.payload.amount ? ` ${inr(e.payload.amount || e.payload.countedCash || 0)}` : ''}<br><small class="mute">${esc(new Date(e.createdAt).toLocaleString())}</small><div class="note bad">${esc(e.error || 'Refused')}</div></div><div><button class="btn ghost" data-evretry="${esc(e.id)}">Try again</button><button class="btn line mt" data-evaside="${esc(e.id)}">Set aside</button></div></div>`)
       .join('')}</div>` : ''}
-    ${!S.snap.local && !can('offlineOptions') ? `<div class="note warn mt" role="status">Your server${S.caps.version && S.caps.version !== 'unknown' ? ` (version ${esc(S.caps.version)})` : ''} is older than this app. Pay later, the service charge, half portions and add-ons, and sending refunds, expenses and cash counts need OrderRestro server 1.38 or newer. Refunds and expenses stay on this phone and are sent once the server is updated.</div>` : ''}
+    ${!S.snap.local && !can('offlineOptions') ? `<div class="note warn mt" role="status">Your server${S.caps.version && S.caps.version !== 'unknown' ? ` (version ${esc(S.caps.version)})` : ''} is older than this app. Pay later, the service charge, half portions and add-ons, and sending refunds, expenses and cash counts need Maxora POS server 1.38 or newer. Refunds and expenses stay on this phone and are sent once the server is updated.</div>` : ''}
     <div class="card mt">
       <h2 style="font-size:1.05rem">Shop settings</h2>
       <button class="btn line block" id="st-staff">Staff &amp; PINs${S.staff.length ? ` (${S.staff.filter((p) => p.active !== false).length})` : ''}</button>
@@ -2173,7 +2173,7 @@ async function settingsCard() {
       <input id="st-sc" type="number" inputmode="decimal" min="0" max="25" step="0.5" value="${S.scPct || ''}" placeholder="0 = off">
       <small class="mute">Never added by itself: the cashier ticks it only when the guest agrees (it cannot be compulsory). It reaches the server as a tip.</small>
       <h3 style="margin:1rem 0 .2rem;font-size:.95rem">Automatic backup</h3>
-      <p class="mute" style="margin:0">${auto ? (info ? `Last saved ${esc(new Date(info.at).toLocaleString())} to <b>${esc(info.location)}</b>${info.survivesUninstall ? '' : ' (removed if the app is uninstalled: copy it off the phone)'}.` : 'Saves everything once a day to Download/OrderRestro on this phone (the last 7 days are kept).') : 'Works in the OrderRestro app.'}</p>
+      <p class="mute" style="margin:0">${auto ? (info ? `Last saved ${esc(new Date(info.at).toLocaleString())} to <b>${esc(info.location)}</b>${info.survivesUninstall ? '' : ' (removed if the app is uninstalled: copy it off the phone)'}.` : 'Saves everything once a day to Download/MaxoraPOS on this phone (the last 7 days are kept).') : 'Works in the Maxora POS app.'}</p>
       ${auto ? '<button class="btn ghost block mt" id="st-bk">Back up now</button>' : ''}
     </div>`;
 }
@@ -2201,7 +2201,7 @@ function bindSettings(redraw) {
 }
 
 /**
- * Once a day (and after closing the day) the whole phone is saved as a JSON file to Download/OrderRestro, so a lost
+ * Once a day (and after closing the day) the whole phone is saved as a JSON file to Download/MaxoraPOS, so a lost
  * or cleared phone is not the only copy. Never contains the password or the staff PINs.
  */
 async function autoBackup(force = false) {
@@ -2212,7 +2212,7 @@ async function autoBackup(force = false) {
   try {
     const data = await readEverything();
     if (!force && !data.sales.length && !data.orders.length) return false; // nothing worth saving yet
-    const r = await np.saveBackup({ name: `orderrestro-auto-${slug()}-${day}.json`, prefix: 'orderrestro-auto-', text: backupJson(data), keep: 7 });
+    const r = await np.saveBackup({ name: `maxora-auto-${slug()}-${day}.json`, prefix: 'maxora-auto-', text: backupJson(data), keep: 7 });
     await kv.set('autoBackupDay', day);
     await kv.set('autoBackupInfo', { at: Date.now(), location: r.location, survivesUninstall: !!r.survivesUninstall });
     await kv.set('lastBackupAt', Date.now());
@@ -2310,7 +2310,7 @@ async function viewSync() {
     }
     await kv.del('snapshot');
     try {
-      localStorage.removeItem('orderrestro.standalone.ready');
+      localStorage.removeItem('maxora.standalone.ready');
     } catch {
       /* storage blocked */
     }

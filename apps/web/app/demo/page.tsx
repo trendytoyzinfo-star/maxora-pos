@@ -20,7 +20,7 @@ export default function DemoEntry() {
       {error ? (
         <div><p className="text-lg font-semibold">{error}</p><a className="mt-3 inline-block underline" href="/demo">Try again</a></div>
       ) : (
-        <div><p className="text-lg font-semibold">Opening the OrderRestro demo…</p><p className="mt-1 text-sm text-muted-foreground">No sign-up. No password.</p></div>
+        <div><p className="text-lg font-semibold">Opening the Maxora POS demo…</p><p className="mt-1 text-sm text-muted-foreground">No sign-up. No password.</p></div>
       )}
     </main>
   );

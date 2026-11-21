@@ -29,7 +29,7 @@ const scenarios = [
     title: "From a tap to a kitchen ticket in about a second.",
     status: "Inside the restaurant · WiFi / local network",
     steps: [
-      "The waiter taps the dishes for table 4 in the OrderRestro app and presses Send to kitchen.",
+      "The waiter taps the dishes for table 4 in the Maxora POS app and presses Send to kitchen.",
       "The order travels over the restaurant WiFi to the restaurant server (port 1995). No internet is needed.",
       "The server checks the waiter's permissions, prices the order and saves it in the PostgreSQL database on that computer.",
       "The server pushes a live update (Socket.IO) to every screen in the restaurant.",
@@ -57,7 +57,7 @@ const scenarios = [
     title: "Check the restaurant remotely through a secure route.",
     status: "Remote access · secure internet connection configured",
     steps: [
-      "The owner opens OrderRestro from home and signs in.",
+      "The owner opens Maxora POS from home and signs in.",
       "A configured secure remote connection reaches the restaurant server.",
       "The server checks access permissions and returns the latest saved figures.",
       "Inside the restaurant, phones, tills and kitchen screens keep using the local WiFi as usual.",
@@ -96,7 +96,7 @@ const scenarios = [
     title: "A Windows laptop can host the restaurant server.",
     status: "Windows host · local WiFi network",
     steps: [
-      "Run the OrderRestro server on a Windows laptop in the restaurant.",
+      "Run the Maxora POS server on a Windows laptop in the restaurant.",
       "Connect phones, tablets and the kitchen display to the same WiFi.",
       "Staff open the server address on their device and sign in with their own role.",
       "The laptop stores the restaurant database and shares updates across the local network.",
@@ -134,7 +134,7 @@ export function ArchitectureWalkthrough() {
           </p>
         </div>
 
-        <div role="tablist" aria-label="OrderRestro situations" className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div role="tablist" aria-label="Maxora POS situations" className="mt-8 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {scenarios.map((scenario) => {
             const Icon = scenario.icon;
             const selected = scenario.id === activeId;
@@ -168,7 +168,7 @@ export function ArchitectureWalkthrough() {
           <div className="rounded-3xl border border-[#164a4d] bg-[#073a3e] p-4 text-[#fff9ed] shadow-[0_24px_60px_-32px_rgba(3,39,42,0.65)] sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#b9d3cc]">OrderRestro network</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#b9d3cc]">Maxora POS network</p>
                 <p className="mt-1 text-sm font-medium text-[#fff9ed]">Restaurant WiFi / local network</p>
               </div>
               <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] text-[#d9e8e2]">
@@ -193,7 +193,7 @@ export function ArchitectureWalkthrough() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">Restaurant server</p>
-                  <p className="mt-0.5 text-xs text-[#c1dad2]">OrderRestro · port 1995</p>
+                  <p className="mt-0.5 text-xs text-[#c1dad2]">Maxora POS · port 1995</p>
                 </div>
                 <span className="size-2 rounded-full bg-[#80d6a7] shadow-[0_0_12px_rgba(128,214,167,0.8)]" aria-label="Server active" />
               </div>

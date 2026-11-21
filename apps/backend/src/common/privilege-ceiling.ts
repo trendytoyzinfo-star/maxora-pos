@@ -2,7 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import {
   permissionSatisfied,
   type SessionUser,
-} from '@nodedr-restaurant/types';
+} from '@maxora/types';
 
 /**
  * Nobody can hand out, edit or take over more access than they hold themselves. Without this, a custom role that

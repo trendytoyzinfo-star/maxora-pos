@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import type { WasteEntryDto } from '@nodedr-restaurant/types';
+import type { WasteEntryDto } from '@maxora/types';
 import { AuditService } from '../../audit/audit.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toCsv } from '../reports/csv';

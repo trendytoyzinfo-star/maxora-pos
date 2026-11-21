@@ -1,6 +1,6 @@
 "use client";
 
-import type { TableStatusDto } from "@nodedr-restaurant/types";
+import type { TableStatusDto } from "@maxora/types";
 import { Users } from "lucide-react";
 import { useState } from "react";
 import { ElapsedTimer } from "@/components/tables/elapsed-timer";

@@ -1,6 +1,6 @@
-# OrderRestro mobile app (Android and iOS)
+# Maxora POS mobile app (Android and iOS)
 
-A Capacitor app that wraps the restaurant's own OrderRestro web app with native features. See `../docs/MOBILE-APP-PLAN.md` for the plan and `store/` for the store material.
+A Capacitor app that wraps the restaurant's own Maxora POS web app with native features. See `../docs/MOBILE-APP-PLAN.md` for the plan and `store/` for the store material.
 
 ## How it works
 
@@ -11,7 +11,7 @@ A Capacitor app that wraps the restaurant's own OrderRestro web app with native 
 
 ## Local and online address (like Immich)
 
-The connect screen takes two addresses for the same restaurant server: a **local** one (the computer on the restaurant WiFi, no internet needed) and an optional **online** one (a public https address). At launch the app asks the local address for `/api/v1/auth/setup-status`; if it answers within about 1.5 seconds it uses it, otherwise it uses the online address. On mobile data it skips the local probe. When the phone changes network the app picks again and reopens on the better address. Everything still goes to the restaurant's own server; there is no NodeDR cloud in between.
+The connect screen takes two addresses for the same restaurant server: a **local** one (the computer on the restaurant WiFi, no internet needed) and an optional **online** one (a public https address). At launch the app asks the local address for `/api/v1/auth/setup-status`; if it answers within about 1.5 seconds it uses it, otherwise it uses the online address. On mobile data it skips the local probe. When the phone changes network the app picks again and reopens on the better address. Everything still goes to the restaurant's own server; there is no Maxora cloud in between.
 
 Sign-in is stored per address, so a person signs in once on each address.
 
@@ -60,7 +60,7 @@ Books (`lib/books.js`, unit tested in `lib/books.test.mjs`). On a phone account 
 - **Close the day**: opening cash + cash sales - cash refunds - cash expenses = expected cash, compared with the cash counted.
 - **Reports** for today, 7 and 30 days.
 - **Stock**: an optional count per dish; counted dishes count down with each sale and switch off at 0. "Sold out" can also be set by hand.
-- **Automatic backup**: once a day (and after closing the day) the whole phone is saved to `Download/OrderRestro` on the phone (MediaStore, no permission; it survives clearing or uninstalling the app; the newest 7 are kept). Android 7-9 keep it in the app's own folder instead. It never contains the password or staff PINs.
+- **Automatic backup**: once a day (and after closing the day) the whole phone is saved to `Download/MaxoraPOS` on the phone (MediaStore, no permission; it survives clearing or uninstalling the app; the newest 7 are kept). Android 7-9 keep it in the app's own folder instead. It never contains the password or staff PINs.
 - **Export and backup**: sales and expenses as CSV (formula characters are neutralised), the whole phone as one JSON backup that restores all-or-nothing and never contains the password. Files go out through Android's share sheet (`NativePrinter.shareFile`, via the FileProvider, no storage permission).
 
 Tests: `node --test www/pos/lib/*.test.mjs`.
@@ -75,16 +75,16 @@ npm ci
 npx cap sync android
 cd android
 ./gradlew assembleDebug                         # app/build/outputs/apk/debug
-ORDERRESTRO_KEYSTORE_PROPERTIES=/path/keystore.properties ./gradlew bundleRelease   # signed .aab for Play
+MAXORA_KEYSTORE_PROPERTIES=/path/keystore.properties ./gradlew bundleRelease   # signed .aab for Play
 ```
 
 `keystore.properties` holds `storeFile`, `storePassword`, `keyAlias`, `keyPassword`. Keep the keystore and that file out of git and back them up: losing the upload key means asking Google to reset it. Use Play App Signing.
 
 ## Push notifications (Firebase)
 
-Create a Firebase project, add the Android app `com.nodedr.orderrestro` and the iOS app with the same id, then:
+Create a Firebase project, add the Android app `com.maxora.pos` and the iOS app with the same id, then:
 
-- Android: put `google-services.json` in `android/app/` (it is git-ignored; a copy is kept in `~/orderrestro-signing/`). The OrderRestro Firebase project is `orderrestro-c0a12` with the Android app `com.nodedr.orderrestro` already registered. Without it the app still works and just does not register for push (it checks `ServerLink.pushReady` first).
+- Android: put `google-services.json` in `android/app/` (it is git-ignored; a copy is kept in `~/maxora-signing/`). The Maxora POS Firebase project is `maxora-c0a12` with the Android app `com.maxora.pos` already registered. Without it the app still works and just does not register for push (it checks `ServerLink.pushReady` first).
 - iOS: not finished. The Capacitor push plugin returns an APNs device token on iPhone, but the server sends through Firebase (FCM), which needs an FCM token. Before iOS push works, either add the Firebase iOS SDK (`GoogleService-Info.plist`, an APNs key uploaded to Firebase and a Firebase Messaging plugin) or have the server send to APNs directly.
 - Server: set `FCM_SERVICE_ACCOUNT_JSON` (or `FCM_SERVICE_ACCOUNT_FILE`) from Firebase > Project settings > Service accounts. Without it push stays off.
 
@@ -125,4 +125,4 @@ save as recipe, and **Drafts and posted vouchers**. All rules stay on the server
 (tested in `stockjournal.test.mjs`) and the "stock journal" section of `www/pos/pos.js`.
 
 Release prep: `versionName 1.40.0` / `versionCode 140000`. `npm run android:release` builds the bundle; signing uses `keystore.properties` or
-`ORDERRESTRO_KEYSTORE_PROPERTIES` as before. Nothing is submitted by the build.
+`MAXORA_KEYSTORE_PROPERTIES` as before. Nothing is submitted by the build.

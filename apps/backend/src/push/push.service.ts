@@ -20,7 +20,7 @@ export interface PushMessage {
 const b64url = (b: Buffer | string) => Buffer.from(b).toString('base64url');
 
 /**
- * Push notifications to the OrderRestro mobile app through Firebase Cloud
+ * Push notifications to the Maxora POS mobile app through Firebase Cloud
  * Messaging (HTTP v1), which delivers to Android directly and to iOS through
  * APNs. Off until a Firebase service account is configured:
  *   FCM_SERVICE_ACCOUNT_JSON (the JSON itself) or FCM_SERVICE_ACCOUNT_FILE (a path).

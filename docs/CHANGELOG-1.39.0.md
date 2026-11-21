@@ -1,4 +1,4 @@
-# OrderRestro 1.39.0
+# Maxora POS 1.39.0
 
 - POS: category dropdown beside search; Manufacturing card removed (it lives in Stock Journal); after "Send to kitchen" you can go "Back to this table" (same table and bill kept) or "Back to POS menu".
 - Sidebar compact by default; expands on hover or keyboard focus and can be pinned open.
