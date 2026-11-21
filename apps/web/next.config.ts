@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
       { pathname: "/api/uploads/**" },
       { pathname: "/logo.png" },
       { pathname: "/brand-lockup.png" },
+      { pathname: "/maxora-logo-full.png" },
       { pathname: "/screenshots/**" },
       { pathname: "/icons/**" },
     ],

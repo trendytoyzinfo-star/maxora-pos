@@ -3,12 +3,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginDto } from "@maxora/types";
 import { motion, useReducedMotion } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AlertCircle } from "lucide-react";
-import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -69,13 +69,21 @@ export default function LoginPage() {
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-sm"
       >
-        <div className="mb-10 flex flex-col items-center gap-2 text-center">
-          <Link href="/">
-            <Logo size={44} />
+        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+          <Link
+            href="/"
+            className="flex w-full max-w-[320px] items-center justify-center rounded-[20px] bg-[#F8FAFC] p-6 shadow-md transition-shadow hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <Image
+              src="/brand-lockup.png"
+              alt="Maxora POS"
+              width={272}
+              height={132}
+              priority
+              className="h-auto w-full object-contain"
+            />
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Maxora POS
-          </h1>
+          <h1 className="sr-only">Maxora POS</h1>
           <p className="text-sm text-muted-foreground">Sign in to manage your restaurant</p>
         </div>
 
