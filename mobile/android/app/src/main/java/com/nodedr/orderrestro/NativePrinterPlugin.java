@@ -1,0 +1,290 @@
+package com.nodedr.orderrestro;
+
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.os.Build;
+import android.print.PrintAttributes;
+import android.print.PrintManager;
+import android.util.Base64;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+import java.io.OutputStream;
+import java.util.Set;
+import java.util.UUID;
+
+/**
+ * Printing from the phone itself, so receipts and kitchen tickets do not depend
+ * on a printer plugged into the restaurant computer:
+ *
+ *  - btPrinters / btPrint: ESC/POS bytes to a paired Bluetooth thermal printer
+ *    (the common 58 mm and 80 mm "mobile printers", serial profile).
+ *  - printHtml: Android's own print dialog with the bill, which offers
+ *    "Save as PDF" and every printer or print service installed on the phone.
+ *
+ * The bytes and the HTML come from the restaurant server.
+ */
+@CapacitorPlugin(
+    name = "NativePrinter",
+    permissions = {
+        @Permission(strings = { Manifest.permission.BLUETOOTH_CONNECT }, alias = "bluetooth")
+    }
+)
+public class NativePrinterPlugin extends Plugin {
+
+    private static final UUID SPP = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private WebView printView; // kept alive while the print dialog is open
+
+    private boolean needsRuntimePermission() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.S;
+    }
+
+    private BluetoothAdapter adapter() {
+        BluetoothManager m = (BluetoothManager) getContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        return m == null ? null : m.getAdapter();
+    }
+
+    @PluginMethod
+    public void btPrinters(PluginCall call) {
+        if (needsRuntimePermission() && getPermissionState("bluetooth") != com.getcapacitor.PermissionState.GRANTED) {
+            requestPermissionForAlias("bluetooth", call, "listCallback");
+            return;
+        }
+        list(call);
+    }
+
+    @PermissionCallback
+    private void listCallback(PluginCall call) {
+        if (getPermissionState("bluetooth") != com.getcapacitor.PermissionState.GRANTED) {
+            call.reject("Bluetooth permission was not allowed. Allow it in the phone settings to find printers.");
+            return;
+        }
+        list(call);
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void list(PluginCall call) {
+        BluetoothAdapter a = adapter();
+        JSObject out = new JSObject();
+        JSArray devices = new JSArray();
+        out.put("enabled", a != null && a.isEnabled());
+        out.put("supported", a != null);
+        if (a != null && a.isEnabled()) {
+            Set<BluetoothDevice> bonded = a.getBondedDevices();
+            for (BluetoothDevice d : bonded) {
+                JSObject o = new JSObject();
+                o.put("name", d.getName() == null ? d.getAddress() : d.getName());
+                o.put("address", d.getAddress());
+                devices.put(o);
+            }
+        }
+        out.put("devices", devices);
+        call.resolve(out);
+    }
+
+    /** Sends base64 ESC/POS data to the paired printer at `address`. */
+    @PluginMethod
+    public void btPrint(PluginCall call) {
+        if (needsRuntimePermission() && getPermissionState("bluetooth") != com.getcapacitor.PermissionState.GRANTED) {
+            requestPermissionForAlias("bluetooth", call, "printCallback");
+            return;
+        }
+        write(call);
+    }
+
+    @PermissionCallback
+    private void printCallback(PluginCall call) {
+        if (getPermissionState("bluetooth") != com.getcapacitor.PermissionState.GRANTED) {
+            call.reject("Bluetooth permission was not allowed. Allow it in the phone settings to print.");
+            return;
+        }
+        write(call);
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void write(final PluginCall call) {
+        final String address = call.getString("address");
+        final String data = call.getString("data");
+        if (address == null || address.isEmpty() || data == null || data.isEmpty()) {
+            call.reject("Choose a Bluetooth printer first.");
+            return;
+        }
+        final BluetoothAdapter a = adapter();
+        if (a == null || !a.isEnabled()) {
+            call.reject("Bluetooth is off. Turn it on and try again.");
+            return;
+        }
+        new Thread(() -> {
+            BluetoothSocket socket = null;
+            try {
+                BluetoothDevice dev = a.getRemoteDevice(address);
+                a.cancelDiscovery();
+                socket = dev.createRfcommSocketToServiceRecord(SPP);
+                socket.connect();
+                OutputStream out = socket.getOutputStream();
+                byte[] bytes = Base64.decode(data, Base64.DEFAULT);
+                int chunk = 512;
+                for (int i = 0; i < bytes.length; i += chunk) {
+                    out.write(bytes, i, Math.min(chunk, bytes.length - i));
+                    out.flush();
+                    Thread.sleep(20);
+                }
+                Thread.sleep(300); // let the printer drain its buffer before closing
+                call.resolve();
+            } catch (Exception e) {
+                call.reject("Could not print on the Bluetooth printer. Check that it is switched on, paired and has paper. (" + e.getMessage() + ")");
+            } finally {
+                try {
+                    if (socket != null) socket.close();
+                } catch (Exception ignored) {}
+            }
+        }).start();
+    }
+
+    /** Opens Android's print dialog (Save as PDF, any installed printer) for an HTML document. */
+    /**
+     * Hand a text file (a CSV of sales, a JSON backup) to Android's share sheet,
+     * so it can go to WhatsApp, Drive, email or "Save to device". The file is
+     * written to the app's own cache and shared through the FileProvider, so no
+     * storage permission is needed. Older exports are removed first.
+     */
+    @PluginMethod
+    public void shareFile(final PluginCall call) {
+        final String text = call.getString("text");
+        if (text == null) {
+            call.reject("There is nothing to share.");
+            return;
+        }
+        final String name = call.getString("name", "orderrestro.txt").replaceAll("[^A-Za-z0-9._-]", "_");
+        final String mime = call.getString("mime", "text/plain");
+        try {
+            java.io.File dir = new java.io.File(getContext().getCacheDir(), "exports");
+            if (!dir.exists() && !dir.mkdirs()) throw new java.io.IOException("cache folder");
+            java.io.File[] old = dir.listFiles();
+            if (old != null) for (java.io.File f : old) f.delete();
+            java.io.File file = new java.io.File(dir, name);
+            try (java.io.FileOutputStream out = new java.io.FileOutputStream(file)) {
+                out.write(text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            }
+            android.net.Uri uri = androidx.core.content.FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", file);
+            android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
+            send.setType(mime);
+            send.putExtra(android.content.Intent.EXTRA_STREAM, uri);
+            send.putExtra(android.content.Intent.EXTRA_SUBJECT, name);
+            send.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            getActivity().startActivity(android.content.Intent.createChooser(send, name));
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("Could not share the file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Automatic backup: writes the file to Download/OrderRestro on the phone, where it survives the app being cleared
+     * or uninstalled and can be copied off with any file manager. One file per day (the same name is replaced), and
+     * only the newest `keep` automatic backups this app made are kept. Android 10+ uses MediaStore (no permission);
+     * older phones keep it in the app's own Documents folder (removed with the app), and the reply says which.
+     */
+    @PluginMethod
+    public void saveBackup(final PluginCall call) {
+        final String text = call.getString("text");
+        if (text == null) {
+            call.reject("There is nothing to save.");
+            return;
+        }
+        final String name = call.getString("name", "orderrestro-auto-backup.json").replaceAll("[^A-Za-z0-9._-]", "_");
+        final String prefix = call.getString("prefix", "orderrestro-auto-").replaceAll("[^A-Za-z0-9._-]", "_");
+        final int keep = Math.max(1, call.getInt("keep", 7));
+        final byte[] bytes = text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        try {
+            JSObject ret = new JSObject();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                android.content.ContentResolver cr = getContext().getContentResolver();
+                android.net.Uri coll = android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+                String folder = android.os.Environment.DIRECTORY_DOWNLOADS + "/OrderRestro/";
+                String[] cols = { android.provider.MediaStore.MediaColumns._ID, android.provider.MediaStore.MediaColumns.DISPLAY_NAME };
+                String where = android.provider.MediaStore.MediaColumns.RELATIVE_PATH + "=? AND " + android.provider.MediaStore.MediaColumns.DISPLAY_NAME + " LIKE ?";
+                // Same day again: replace that file instead of making "name (1).json".
+                try (android.database.Cursor c = cr.query(coll, cols, where, new String[] { folder, name }, null)) {
+                    while (c != null && c.moveToNext()) cr.delete(android.content.ContentUris.withAppendedId(coll, c.getLong(0)), null, null);
+                }
+                android.content.ContentValues v = new android.content.ContentValues();
+                v.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name);
+                v.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "application/json");
+                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, folder);
+                v.put(android.provider.MediaStore.MediaColumns.IS_PENDING, 1);
+                android.net.Uri uri = cr.insert(coll, v);
+                if (uri == null) throw new java.io.IOException("the Downloads folder is not available");
+                try (OutputStream out = cr.openOutputStream(uri, "w")) {
+                    if (out == null) throw new java.io.IOException("could not open the file");
+                    out.write(bytes);
+                }
+                v.clear();
+                v.put(android.provider.MediaStore.MediaColumns.IS_PENDING, 0);
+                cr.update(uri, v, null, null);
+                // Keep only the newest `keep` automatic backups this app made (names sort by date).
+                java.util.List<Long> mine = new java.util.ArrayList<>();
+                try (android.database.Cursor c = cr.query(coll, cols, where, new String[] { folder, prefix + "%" }, android.provider.MediaStore.MediaColumns.DISPLAY_NAME + " DESC")) {
+                    while (c != null && c.moveToNext()) mine.add(c.getLong(0));
+                }
+                for (int i = keep; i < mine.size(); i++) cr.delete(android.content.ContentUris.withAppendedId(coll, mine.get(i)), null, null);
+                ret.put("location", "Download/OrderRestro/" + name);
+                ret.put("survivesUninstall", true);
+            } else {
+                java.io.File dir = new java.io.File(getContext().getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS), "backups");
+                if (!dir.exists() && !dir.mkdirs()) throw new java.io.IOException("could not make the backup folder");
+                try (java.io.FileOutputStream out = new java.io.FileOutputStream(new java.io.File(dir, name))) {
+                    out.write(bytes);
+                }
+                java.io.File[] all = dir.listFiles((d, n) -> n.startsWith(prefix));
+                if (all != null && all.length > keep) {
+                    java.util.Arrays.sort(all, (a, b) -> b.getName().compareTo(a.getName()));
+                    for (int i = keep; i < all.length; i++) all[i].delete();
+                }
+                ret.put("location", "Android/data/" + getContext().getPackageName() + "/files/Documents/backups/" + name);
+                ret.put("survivesUninstall", false);
+            }
+            call.resolve(ret);
+        } catch (Exception e) {
+            call.reject("Could not save the backup: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void printHtml(final PluginCall call) {
+        final String html = call.getString("html");
+        final String name = call.getString("name", "OrderRestro");
+        if (html == null || html.isEmpty()) {
+            call.reject("Nothing to print.");
+            return;
+        }
+        getActivity().runOnUiThread(() -> {
+            try {
+                final WebView view = new WebView(getContext());
+                printView = view;
+                view.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView v, String url) {
+                        PrintManager pm = (PrintManager) getContext().getSystemService(Context.PRINT_SERVICE);
+                        pm.print(name, v.createPrintDocumentAdapter(name), new PrintAttributes.Builder().build());
+                        call.resolve();
+                    }
+                });
+                view.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+            } catch (Exception e) {
+                call.reject("Could not open the print dialog: " + e.getMessage());
+            }
+        });
+    }
+}
