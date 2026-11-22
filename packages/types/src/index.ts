@@ -24,3 +24,4 @@ export * from "./order-lifecycle";
 export * from "./stock-journal";
 export * from "./display";
 export * from "./table-lifecycle";
+export * from "./platform-auth";

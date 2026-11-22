@@ -3746,3 +3746,93 @@ model StockJournalLine {
   @@index([ingredientId])
   @@map("stock_journal_lines")
 }
+
+// ===========================================================================
+// Platform (Super Admin) — completely separate from restaurant users
+// ===========================================================================
+
+enum PlatformRole {
+  SUPER_ADMIN
+  PLATFORM_ADMIN
+  SUPPORT_AGENT
+  BILLING_MANAGER
+  ANALYST
+}
+
+model PlatformUser {
+  id               String        @id @default(cuid())
+  name             String
+  email            String        @unique
+  passwordHash     String
+  role             PlatformRole  @default(SUPPORT_AGENT)
+  /// AES-256-GCM sealed TOTP secret (totp.ts sealSecret)
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean       @default(false)
+  /// Step counter to prevent TOTP code replay
+  twoFactorLastStep Int?
+  /// Argon2-hashed recovery codes (array)
+  recoveryCodes    String[]
+  /// ACTIVE | SUSPENDED | LOCKED
+  status           String        @default("ACTIVE")
+  failedAttempts   Int           @default(0)
+  lockedUntil      DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime      @default(now())
+
+  sessions  PlatformSession[]
+  auditLogs PlatformAuditLog[]
+  alerts    PlatformAlert[]
+
+  @@map("platform_users")
+}
+
+model PlatformSession {
+  id               String       @id @default(cuid())
+  userId           String
+  user             PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String
+  device           String?
+  ip               String?
+  userAgent        String?
+  createdAt        DateTime     @default(now())
+  lastSeenAt       DateTime     @default(now())
+  expiresAt        DateTime
+  revokedAt        DateTime?
+
+  @@index([userId])
+  @@map("platform_sessions")
+}
+
+model PlatformAuditLog {
+  id       String        @id @default(cuid())
+  actorId  String?
+  actor    PlatformUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action   String
+  entity   String
+  entityId String?
+  before   Json?
+  after    Json?
+  ip       String?
+  device   String?
+  createdAt DateTime     @default(now())
+
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("platform_audit_logs")
+}
+
+model PlatformAlert {
+  id         String        @id @default(cuid())
+  /// S1 | S2 | S3
+  severity   String
+  /// NEW_DEVICE_LOGIN | etc.
+  type       String
+  message    String
+  userId     String?
+  user       PlatformUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt  DateTime      @default(now())
+  resolvedAt DateTime?
+
+  @@index([userId])
+  @@map("platform_alerts")
+}

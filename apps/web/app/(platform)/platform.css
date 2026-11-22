@@ -1,0 +1,17 @@
+/*
+ * Platform shell CSS — dark theme tokens.
+ * Applied under .platform-shell wrapper in the layout.
+ * Uses CSS custom properties so a future light theme can override them.
+ */
+.platform-shell {
+  --plt-bg: #0b1220;
+  --plt-surface: #111a2e;
+  --plt-border: #243049;
+  --plt-text: #f1f5f9;
+  --plt-muted: #94a3b8;
+  --plt-gold: #d4af37;
+
+  background-color: var(--plt-bg);
+  color: var(--plt-text);
+  min-height: 100vh;
+}
