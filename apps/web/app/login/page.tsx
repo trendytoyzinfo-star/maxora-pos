@@ -1,60 +1,147 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, type LoginDto } from "@maxora/types";
 import { motion, useReducedMotion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
-import { useLogin } from "@/hooks/use-auth";
+import { useUnifiedLogin, useVerifyPlatformMfa } from "@/hooks/use-unified-login";
 import { useDemoInfo } from "@/hooks/use-demo";
 import { ApiError } from "@/lib/api";
+import { SERVER_ERROR_MESSAGE } from "@/lib/safe-fetch";
+
+type Locale = "en" | "hi";
+type Mode = "password" | "pin";
+
+// Local copy only for this page: the app-wide i18n covers en/es/fr, this page offers English / हिन्दी.
+const T: Record<Locale, Record<string, string>> = {
+  en: {
+    subtitle: "Sign in to continue",
+    identifier: "Email or phone number",
+    identifierPh: "you@example.com or phone number",
+    password: "Password",
+    passwordPh: "Your password",
+    pin: "PIN",
+    pinPh: "Your PIN",
+    code: "Verification code",
+    codePh: "6-digit code or recovery code",
+    codeHelp: "Open your authenticator app, or use one of your recovery codes.",
+    signIn: "Sign in",
+    signingIn: "Signing in…",
+    verify: "Verify",
+    verifying: "Verifying…",
+    demo: "Try the live demo (no password)",
+    newRestaurant: "New restaurant?",
+    create: "Create an account",
+    required: "Please fill in all fields.",
+  },
+  hi: {
+    subtitle: "जारी रखने के लिए साइन इन करें",
+    identifier: "ईमेल या फ़ोन नंबर",
+    identifierPh: "you@example.com या फ़ोन नंबर",
+    password: "पासवर्ड",
+    passwordPh: "आपका पासवर्ड",
+    pin: "पिन",
+    pinPh: "आपका पिन",
+    code: "सत्यापन कोड",
+    codePh: "6 अंकों का कोड या रिकवरी कोड",
+    codeHelp: "अपना ऑथेंटिकेटर ऐप खोलें, या रिकवरी कोड में से एक का उपयोग करें।",
+    signIn: "साइन इन करें",
+    signingIn: "साइन इन हो रहा है…",
+    verify: "सत्यापित करें",
+    verifying: "सत्यापित हो रहा है…",
+    demo: "लाइव डेमो आज़माएँ (बिना पासवर्ड)",
+    newRestaurant: "नया रेस्तरां?",
+    create: "खाता बनाएँ",
+    required: "कृपया सभी फ़ील्ड भरें।",
+  },
+};
 
 export default function LoginPage() {
   const router = useRouter();
-  const login = useLogin();
+  const login = useUnifiedLogin();
+  const verifyMfa = useVerifyPlatformMfa();
   const { data: demo } = useDemoInfo();
-  // Set once the server says this account uses two-factor authentication.
-  const [needsCode, setNeedsCode] = useState(false);
-  // Shown inline under the form (a toast vanishes before it can be read).
-  const [error, setError] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginDto>({ resolver: zodResolver(loginSchema) });
 
-  const onSubmit = (dto: LoginDto) => {
+  const [locale, setLocale] = useState<Locale>("en");
+  const [mode, setMode] = useState<Mode>("password");
+  const [identifier, setIdentifier] = useState("");
+  const [secret, setSecret] = useState("");
+  const [code, setCode] = useState("");
+  // Restaurant two-factor: the server asked for a code after a correct password.
+  const [needsCode, setNeedsCode] = useState(false);
+  // Platform two-factor (PLATFORM_REQUIRE_2FA): a short-lived token for the code step, kept in memory only.
+  const [mfaToken, setMfaToken] = useState<string | null>(null);
+  // Inline under the form (a toast vanishes before it can be read).
+  const [error, setError] = useState<string | null>(null);
+
+  const t = T[locale];
+  const pending = login.isPending || verifyMfa.isPending;
+  const showCode = needsCode || mfaToken !== null;
+
+  const fail = (err: unknown) => {
+    setError(err instanceof ApiError ? err.message : SERVER_ERROR_MESSAGE);
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
-    login.mutate(dto, {
-      onSuccess: (data) => {
-        // A delivery rider has no back-office screens: open their deliveries.
-        const user = (data as { user?: { roleName?: string; permissions?: string[] } }).user;
-        const rider = user?.roleName === "DELIVERY_STAFF" && user.permissions?.includes("delivery.rider");
-        router.push(rider ? "/my-deliveries" : "/dashboard");
+
+    // Platform 2FA step: only the code is sent, together with the token from step one.
+    if (mfaToken) {
+      if (!code.trim()) return setError(t.required);
+      verifyMfa.mutate(
+        { code, mfaToken },
+        { onSuccess: () => router.push("/platform/dashboard"), onError: fail },
+      );
+      return;
+    }
+
+    if (!identifier.trim() || !secret) return setError(t.required);
+    login.mutate(
+      {
+        identifier: identifier.trim(),
+        secret,
+        mode,
+        ...(needsCode && code.trim() ? { totp: code.trim() } : {}),
       },
-      onError: (err) => {
-        if (err instanceof ApiError && err.message === "TWO_FACTOR_REQUIRED") {
-          setNeedsCode(true);
-          return;
-        }
-        if (err instanceof ApiError && err.status >= 500) {
-          setError("The server is having a problem right now. Please try again in a minute.");
-        } else if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          setError("Can't reach the server. Check your internet connection and try again.");
-        }
+      {
+        onSuccess: (data) => {
+          if (data.accountType === "platform") {
+            if (data.mfaRequired && data.mfaToken) {
+              setMfaToken(data.mfaToken);
+              setCode("");
+              return;
+            }
+            router.push("/platform/dashboard");
+            return;
+          }
+          // A delivery rider has no back-office screens: open their deliveries.
+          const rider =
+            data.user.roleName === "DELIVERY_STAFF" && data.user.permissions.includes("delivery.rider");
+          router.push(rider ? "/my-deliveries" : "/dashboard");
+        },
+        onError: (err) => {
+          if (err instanceof ApiError && err.message === "TWO_FACTOR_REQUIRED") {
+            setNeedsCode(true);
+            return;
+          }
+          fail(err);
+        },
       },
-    });
+    );
+  };
+
+  const switchMode = (next: Mode) => {
+    setMode(next);
+    setSecret("");
+    setError(null);
   };
 
   return (
@@ -84,62 +171,106 @@ export default function LoginPage() {
             />
           </Link>
           <h1 className="sr-only">Maxora POS</h1>
-          <p className="text-sm text-muted-foreground">Sign in to manage your restaurant</p>
+          <div className="flex w-full items-center justify-between">
+            <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+            <button
+              type="button"
+              onClick={() => setLocale(locale === "en" ? "hi" : "en")}
+              className="rounded px-1 text-xs font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={locale === "en" ? "हिन्दी में बदलें" : "Switch to English"}
+            >
+              {locale === "en" ? "हिन्दी" : "English"}
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">Email or phone number</Label>
-            <Input
-              id="email"
-              type="text"
-              autoComplete="username"
-              inputMode="email"
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              enterKeyHint="next"
-              autoFocus
-              className="h-11"
-              placeholder="you@restaurant.com or phone number"
-              {...register("email")}
-            />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
-            )}
-          </div>
+        <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
+          {!mfaToken && (
+            <>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="identifier">{t.identifier}</Label>
+                <Input
+                  id="identifier"
+                  type="text"
+                  autoComplete="username"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  enterKeyHint="next"
+                  autoFocus
+                  className="h-11"
+                  placeholder={t.identifierPh}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                />
+              </div>
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Password</Label>
-            <PasswordInput
-              id="password"
-              
-              autoComplete="current-password"
-              enterKeyHint="go"
-              className="h-11"
-              placeholder="Your password"
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password.message}</p>
-            )}
-          </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="secret">{mode === "pin" ? t.pin : t.password}</Label>
+                  <div
+                    role="group"
+                    aria-label="Sign-in method"
+                    className="inline-flex rounded-md border border-border p-0.5 text-xs"
+                  >
+                    {(["password", "pin"] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        aria-pressed={mode === m}
+                        onClick={() => switchMode(m)}
+                        className={`rounded px-2 py-1 font-medium transition-colors ${
+                          mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {m === "pin" ? t.pin : t.password}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {mode === "pin" ? (
+                  <Input
+                    id="secret"
+                    type="password"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={8}
+                    enterKeyHint="go"
+                    className="h-11"
+                    placeholder={t.pinPh}
+                    value={secret}
+                    onChange={(e) => setSecret(e.target.value.replace(/\D/g, ""))}
+                  />
+                ) : (
+                  <PasswordInput
+                    id="secret"
+                    autoComplete="current-password"
+                    enterKeyHint="go"
+                    className="h-11"
+                    placeholder={t.passwordPh}
+                    value={secret}
+                    onChange={(e) => setSecret(e.target.value)}
+                  />
+                )}
+              </div>
+            </>
+          )}
 
-          {needsCode && (
+          {showCode && (
             <div className="flex flex-col gap-2">
-              <Label htmlFor="totp">Verification code</Label>
+              <Label htmlFor="totp">{t.code}</Label>
               <Input
                 id="totp"
                 inputMode="text"
                 autoComplete="one-time-code"
                 autoFocus
-                placeholder="6-digit code or recovery code"
-                {...register("totp")}
+                className="h-11"
+                placeholder={t.codePh}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
-                Open your authenticator app, or use one of your recovery codes.
-              </p>
-              {errors.totp && <p className="text-xs text-destructive">{errors.totp.message}</p>}
+              <p className="text-xs text-muted-foreground">{t.codeHelp}</p>
             </div>
           )}
 
@@ -153,18 +284,29 @@ export default function LoginPage() {
             </div>
           )}
 
-          <Button type="submit" className="mt-2 h-12 text-base" disabled={login.isPending}>
-            {login.isPending ? "Signing in…" : "Sign in"}
+          <Button type="submit" className="mt-2 h-12 text-base" disabled={pending}>
+            {mfaToken
+              ? pending
+                ? t.verifying
+                : t.verify
+              : pending
+                ? t.signingIn
+                : t.signIn}
           </Button>
           {demo?.demo && (
-            <Link href="/demo" className="inline-flex h-12 items-center justify-center rounded-lg border border-border text-base font-medium hover:bg-muted">Try the live demo (no password)</Link>
+            <Link
+              href="/demo"
+              className="inline-flex h-12 items-center justify-center rounded-lg border border-border text-base font-medium hover:bg-muted"
+            >
+              {t.demo}
+            </Link>
           )}
         </form>
 
         <p className="mt-8 text-center text-xs text-muted-foreground">
-          New restaurant?{" "}
+          {t.newRestaurant}{" "}
           <Link href="/signup" className="font-medium text-foreground hover:underline">
-            Create an account
+            {t.create}
           </Link>
         </p>
       </motion.div>

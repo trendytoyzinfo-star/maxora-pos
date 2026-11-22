@@ -10,7 +10,7 @@ import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 import * as argon2 from 'argon2';
 import { PlatformAuditService } from './platform-audit.service';
 import { PlatformTwoFactorService } from './platform-two-factor.service';
-import { PlatformRawDb } from './platform-raw-db.service';
+import { PlatformRawDb, type RawPlatformUser } from './platform-raw-db.service';
 import type { PlatformLoginDto, PlatformTotpDto, PlatformRecoveryDto } from '@maxora/types';
 
 const ACCESS_TOKEN_EXPIRES_S = 15 * 60; // 15 min
@@ -20,6 +20,8 @@ const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 min
 const PLATFORM_ISS = 'maxora-platform';
 const MFA_ISS = 'maxora-platform-mfa';
+
+let dummyHashPromise: Promise<string> | null = null;
 
 function hashToken(token: string): string {
   return createHash('sha256').update(token).digest('hex');
@@ -115,31 +117,50 @@ export class PlatformAuthService {
 
   // ---------------------------------------------------------------------------
   // Login
+  //
+  // Split into three steps so the unified /login endpoint can decide between a
+  // platform and a restaurant account without side effects on the wrong one:
+  //   verifyCredentials -> (no writes) real Argon2 verify, dummy hash if unusable
+  //   completeLogin     -> success path (reset counters, alert, audit, session/MFA)
+  //   recordFailure     -> failure path (counter, lockout, audit)
   // ---------------------------------------------------------------------------
 
-  async login(
-    dto: PlatformLoginDto,
-    ip?: string,
-    userAgent?: string,
-  ): Promise<
-    | { type: 'mfa_required'; mfaToken: string }
-    | { type: 'success'; accessToken: string; refreshToken: string }
-  > {
-    const user = await this.rawDb.findUserByEmail(dto.email);
+  private isLocked(user: RawPlatformUser): boolean {
+    return !!user.lockedUntil && user.lockedUntil > new Date();
+  }
 
-    const genericError = 'Invalid credentials';
+  /** A LOCKED status whose lockout window has passed is usable again. */
+  private isUsable(user: RawPlatformUser): boolean {
+    if (this.isLocked(user)) return false;
+    return user.status === 'ACTIVE' || user.status === 'LOCKED';
+  }
 
-    if (!user) {
-      // Constant-time dummy compare to prevent timing attacks
-      await this.verifyPassword(
-        '$argon2id$v=19$m=65536,t=3,p=4$dummysalt$dummyhash',
-        dto.password,
-      ).catch(() => null);
-      throw new UnauthorizedException(genericError);
-    }
+  private getDummyHash(): Promise<string> {
+    // A real Argon2 hash (random password) so a verify against it costs the
+    // same as verifying a real account — a malformed hash would fail fast and
+    // leak, through response time, that the e-mail is unknown.
+    dummyHashPromise ??= argon2.hash(randomBytes(16).toString('hex'));
+    return dummyHashPromise;
+  }
 
-    // Lockout check
-    if (user.lockedUntil && user.lockedUntil > new Date()) {
+  /** Spend one real Argon2 verify (against a dummy hash) — keeps timing flat when no platform lookup applies. */
+  async burnVerify(password: string): Promise<void> {
+    await this.verifyPassword(await this.getDummyHash(), password).catch(() => false);
+  }
+
+  async verifyCredentials(
+    email: string,
+    password: string,
+  ): Promise<{ user: RawPlatformUser | null; valid: boolean }> {
+    const user = await this.rawDb.findUserByEmail(email);
+    const usable = !!user && this.isUsable(user);
+    const hash = usable && user ? user.passwordHash : await this.getDummyHash();
+    const matches = await this.verifyPassword(hash, password).catch(() => false);
+    return { user, valid: usable && matches };
+  }
+
+  async recordFailure(user: RawPlatformUser, ip?: string, userAgent?: string): Promise<void> {
+    if (this.isLocked(user)) {
       await this.audit.record({
         actorId: user.id,
         action: 'LOGIN_ATTEMPT_LOCKED',
@@ -148,35 +169,34 @@ export class PlatformAuthService {
         ip,
         device: userAgent,
       });
-      throw new UnauthorizedException(genericError);
+      return;
     }
+    const attempts = user.failedAttempts + 1;
+    const shouldLock = attempts >= MAX_FAILED_ATTEMPTS;
+    await this.rawDb.updateUser(user.id, {
+      failedAttempts: attempts,
+      ...(shouldLock
+        ? { lockedUntil: new Date(Date.now() + LOCKOUT_DURATION_MS), status: 'LOCKED' }
+        : {}),
+    });
+    await this.audit.record({
+      actorId: user.id,
+      action: shouldLock ? 'LOGIN_LOCKOUT' : 'LOGIN_FAILED',
+      entity: 'PlatformUser',
+      entityId: user.id,
+      ip,
+      device: userAgent,
+    });
+  }
 
-    if (user.status !== 'ACTIVE') {
-      throw new UnauthorizedException(genericError);
-    }
-
-    const valid = await this.verifyPassword(user.passwordHash, dto.password);
-
-    if (!valid) {
-      const attempts = user.failedAttempts + 1;
-      const shouldLock = attempts >= MAX_FAILED_ATTEMPTS;
-      await this.rawDb.updateUser(user.id, {
-        failedAttempts: attempts,
-        ...(shouldLock
-          ? { lockedUntil: new Date(Date.now() + LOCKOUT_DURATION_MS), status: 'LOCKED' }
-          : {}),
-      });
-      await this.audit.record({
-        actorId: user.id,
-        action: shouldLock ? 'LOGIN_LOCKOUT' : 'LOGIN_FAILED',
-        entity: 'PlatformUser',
-        entityId: user.id,
-        ip,
-        device: userAgent,
-      });
-      throw new UnauthorizedException(genericError);
-    }
-
+  async completeLogin(
+    user: RawPlatformUser,
+    ip?: string,
+    userAgent?: string,
+  ): Promise<
+    | { type: 'mfa_required'; mfaToken: string }
+    | { type: 'success'; accessToken: string; refreshToken: string }
+  > {
     // Reset failure counter on success
     await this.rawDb.updateUser(user.id, {
       failedAttempts: 0,
@@ -212,6 +232,24 @@ export class PlatformAuthService {
 
     const { accessToken, refreshToken } = await this.createSession(user.id, ip, userAgent);
     return { type: 'success', accessToken, refreshToken };
+  }
+
+  async login(
+    dto: PlatformLoginDto,
+    ip?: string,
+    userAgent?: string,
+  ): Promise<
+    | { type: 'mfa_required'; mfaToken: string }
+    | { type: 'success'; accessToken: string; refreshToken: string }
+  > {
+    const genericError = 'Invalid credentials';
+    const { user, valid } = await this.verifyCredentials(dto.email, dto.password);
+    if (!user) throw new UnauthorizedException(genericError);
+    if (!valid) {
+      await this.recordFailure(user, ip, userAgent);
+      throw new UnauthorizedException(genericError);
+    }
+    return this.completeLogin(user, ip, userAgent);
   }
 
   // ---------------------------------------------------------------------------

@@ -25,7 +25,7 @@ export default function PlatformSecurityPage() {
       router.replace("/platform/2fa-setup");
       return;
     }
-    router.replace("/platform/login");
+    router.replace("/login");
   }, [isError, error, router]);
 
   if (isLoading) {
@@ -116,7 +116,7 @@ export default function PlatformSecurityPage() {
             <button
               onClick={() =>
                 logoutAll.mutate(undefined, {
-                  onSuccess: () => router.replace("/platform/login"),
+                  onSuccess: () => router.replace("/login"),
                 })
               }
               disabled={logoutAll.isPending}

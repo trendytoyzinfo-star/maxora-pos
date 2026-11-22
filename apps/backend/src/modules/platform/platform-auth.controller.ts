@@ -16,6 +16,13 @@ import type { Request, Response } from 'express';
 import { PlatformAuthService } from './platform-auth.service';
 import { PlatformAuthGuard } from './platform-auth.guard';
 import { PlatformMfaGuard } from './platform-mfa.guard';
+import {
+  PLATFORM_ACCESS_COOKIE,
+  PLATFORM_REFRESH_COOKIE,
+  PLATFORM_ACCESS_MAX_AGE,
+  PLATFORM_REFRESH_MAX_AGE,
+  platformCookieOpts,
+} from './platform-cookies';
 import type {
   PlatformLoginDto,
   PlatformTotpDto,
@@ -24,20 +31,11 @@ import type {
   PlatformSessionUser,
 } from '@maxora/types';
 
-const ACCESS_COOKIE = 'maxora_platform_session';
-const REFRESH_COOKIE = 'maxora_platform_refresh';
-const ACCESS_MAX_AGE = 15 * 60 * 1000;
-const REFRESH_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
-
-function cookieOpts(maxAge: number, path = '/') {
-  return {
-    httpOnly: true,
-    sameSite: 'lax' as const,
-    secure: process.env.COOKIE_SECURE === 'true',
-    path,
-    maxAge,
-  };
-}
+const ACCESS_COOKIE = PLATFORM_ACCESS_COOKIE;
+const REFRESH_COOKIE = PLATFORM_REFRESH_COOKIE;
+const ACCESS_MAX_AGE = PLATFORM_ACCESS_MAX_AGE;
+const REFRESH_MAX_AGE = PLATFORM_REFRESH_MAX_AGE;
+const cookieOpts = platformCookieOpts;
 
 function getIp(req: Request): string | undefined {
   return (req.ip ?? (req.socket?.remoteAddress)) || undefined;

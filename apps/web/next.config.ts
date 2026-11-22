@@ -48,6 +48,14 @@ const nextConfig: NextConfig = {
   // socket.io's endpoint is literally "/socket.io/" — the backend 404s on the
   // slash-less form, so Next must not redirect it.
   skipTrailingSlashRedirect: true,
+  // The platform sign-in page was merged into /login. Keep old links and
+  // bookmarks working (temporary redirect: the target may be re-split later).
+  async redirects() {
+    return [
+      { source: "/platform/login", destination: "/login", permanent: false },
+      { source: "/platform/login/2fa", destination: "/login", permanent: false },
+    ];
+  },
   async rewrites() {
     return [
       { source: "/api/:path*", destination: `${BACKEND_URL}/api/:path*` },

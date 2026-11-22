@@ -93,8 +93,30 @@ function resolveJwtSecret(): string {
   }
 }
 
+// The platform (Super Admin) sign-in signs its own tokens with this secret,
+// separate from JWT_SECRET. Fail at boot with a clear message rather than let
+// Nest die later with an opaque "Configuration key does not exist".
+function requirePlatformJwtSecret(): void {
+  const secret = (process.env.PLATFORM_JWT_SECRET ?? '').trim();
+  const problem = !secret
+    ? 'PLATFORM_JWT_SECRET is required'
+    : !isUsableSecret(secret)
+      ? 'PLATFORM_JWT_SECRET is a placeholder or shorter than ' + MIN_JWT_SECRET_LENGTH + ' characters'
+      : secret === (process.env.JWT_SECRET ?? '').trim()
+        ? 'PLATFORM_JWT_SECRET must be different from JWT_SECRET'
+        : null;
+  if (problem) {
+    console.error(
+      'Refusing to start: ' + problem + '. Set a unique random value in the backend environment ' +
+        '(generate one with openssl rand -hex 32).',
+    );
+    process.exit(1);
+  }
+}
+
 async function bootstrap() {
   process.env.JWT_SECRET = resolveJwtSecret();
+  requirePlatformJwtSecret();
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true, // signed aggregator webhooks are verified against the exact bytes received
   });

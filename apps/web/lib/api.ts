@@ -26,7 +26,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   });
 
   if (!res.ok) {
-    const body = await res.json().catch(() => ({ message: res.statusText }));
+    // A proxy/crashed backend answers in plain text: never surface "Internal Server Error" or a JSON-parse message.
+    const body = await res.json().catch(() => ({
+      message: res.status >= 500 ? "Server error, please try again" : res.statusText,
+    }));
     throw new ApiError(body.message ?? "Request failed", res.status, body.issues, body.code);
   }
 

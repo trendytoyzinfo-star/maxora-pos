@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sessionUserSchema } from "./auth";
 
 // ---------------------------------------------------------------------------
 // Enums
@@ -72,3 +73,35 @@ export const platformSessionSchema = z.object({
   revokedAt: z.string().nullable(),
 });
 export type PlatformSessionInfo = z.infer<typeof platformSessionSchema>;
+
+// ---------------------------------------------------------------------------
+// Unified login (POST /api/auth/unified-login) — one entry for restaurant staff
+// and platform (Super Admin) accounts. The server decides which account type
+// matched; the client never sends or sees it until after success.
+// ---------------------------------------------------------------------------
+
+export const unifiedLoginSchema = z.object({
+  // Email address or phone number.
+  identifier: z.string().trim().min(3).max(200),
+  // Password, or a PIN when mode === "pin".
+  secret: z.string().min(1).max(200),
+  mode: z.enum(["password", "pin"]).default("password"),
+  // Restaurant authenticator/recovery code (platform 2FA uses its own step).
+  totp: z.string().trim().min(6).max(20).optional(),
+  deviceId: z.string().trim().min(8).max(120).optional(),
+});
+export type UnifiedLoginDto = z.infer<typeof unifiedLoginSchema>;
+
+export const unifiedLoginResponseSchema = z.discriminatedUnion("accountType", [
+  z.object({
+    accountType: z.literal("restaurant"),
+    user: sessionUserSchema,
+  }),
+  z.object({
+    accountType: z.literal("platform"),
+    ok: z.literal(true).optional(),
+    mfaRequired: z.boolean().optional(),
+    mfaToken: z.string().optional(),
+  }),
+]);
+export type UnifiedLoginResponse = z.infer<typeof unifiedLoginResponseSchema>;

@@ -17,7 +17,7 @@ export default function PlatformDashboardPage() {
       router.replace("/platform/2fa-setup");
       return;
     }
-    router.replace("/platform/login");
+    router.replace("/login");
   }, [isError, error, router]);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function PlatformDashboardPage() {
             Security
           </Link>
           <button
-            onClick={() => logout.mutate(undefined, { onSuccess: () => router.replace("/platform/login") })}
+            onClick={() => logout.mutate(undefined, { onSuccess: () => router.replace("/login") })}
             disabled={logout.isPending}
             className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
             style={{ background: "var(--plt-surface)", color: "var(--plt-muted)", border: "1px solid var(--plt-border)" }}

@@ -56,6 +56,7 @@ import { McpModule } from './mcp/mcp.module';
 import { SystemModule } from './system/system.module';
 import { VerifactuModule } from './modules/verifactu/verifactu.module';
 import { PlatformModule } from './modules/platform/platform.module';
+import { UnifiedAuthModule } from './modules/unified-auth/unified-auth.module';
 
 @Module({
   imports: [
@@ -112,6 +113,7 @@ import { PlatformModule } from './modules/platform/platform.module';
     McpModule,
     SystemModule,
     PlatformModule,
+    UnifiedAuthModule,
   ],
   controllers: [AppController],
   providers: [

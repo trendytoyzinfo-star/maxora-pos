@@ -2,25 +2,30 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { PlatformLoginDto, PlatformTotpDto, PlatformRecoveryDto } from "@maxora/types";
+import { friendlyMessage, NETWORK_ERROR_MESSAGE, readJsonSafely } from "@/lib/safe-fetch";
 
 // All platform API calls go through the Next.js /api proxy → backend /api/platform/...
 const BASE = "/api/platform";
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
-    ...init,
-  });
-  if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { message?: string; code?: string };
-    const err = new Error(body.message ?? `HTTP ${res.status}`) as Error & { status: number; code?: string };
-    err.status = res.status;
-    err.code = body.code;
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+      ...init,
+    });
+  } catch {
+    throw Object.assign(new Error(NETWORK_ERROR_MESSAGE), { status: 0 });
+  }
+  const result = await readJsonSafely<T & { message?: string; code?: string }>(res);
+  if (!result.ok) {
+    const err = new Error(friendlyMessage(result)) as Error & { status: number; code?: string };
+    err.status = result.status;
+    err.code = result.data?.code;
     throw err;
   }
-  if (res.status === 204) return {} as T;
-  return res.json() as Promise<T>;
+  return (result.data ?? ({} as T)) as T;
 }
 
 // ---------------------------------------------------------------------------
