@@ -69,18 +69,18 @@ export default function LoginPage() {
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="w-full max-w-sm"
       >
-        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+        <div className="mb-8 flex flex-col items-center gap-2 text-center">
           <Link
             href="/"
-            className="flex w-full max-w-[320px] items-center justify-center rounded-[20px] bg-[#F8FAFC] p-6 shadow-md transition-shadow hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex w-full max-w-[320px] items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Image
-              src="/brand-lockup.png"
+              src="/brand-lockup-transparent.png"
               alt="Maxora POS"
-              width={272}
-              height={132}
+              width={320}
+              height={156}
               priority
-              className="h-auto w-full object-contain"
+              className="h-auto w-full max-w-[320px] object-contain"
             />
           </Link>
           <h1 className="sr-only">Maxora POS</h1>
