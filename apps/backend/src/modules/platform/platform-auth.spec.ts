@@ -5,9 +5,11 @@
  * 1. Lockout after 5 failed attempts — error stays generic
  * 2. Wrong password → generic "Invalid credentials"
  * 2b. Non-existent user → generic "Invalid credentials"
- * 3. SUPER_ADMIN without 2FA enabled → MFA_SETUP_REQUIRED on PlatformMfaGuard
+ * 3. SUPER_ADMIN without 2FA enabled → MFA_SETUP_REQUIRED on PlatformMfaGuard (when PLATFORM_REQUIRE_2FA=true)
  * 3b. SUPER_ADMIN with 2FA enabled → allowed
  * 3c. ANALYST without 2FA → allowed (not mandatory)
+ * 3d. PLATFORM_REQUIRE_2FA=false (and unset default) → login goes straight to session (even with 2FA enabled) & guard allows
+ * 3e. PLATFORM_REQUIRE_2FA=true → login returns mfa_required for user with 2FA enabled & guard requires 2FA
  * 4. JWT isolation — platform token without iss !== 'maxora-platform'
  * 5. JWT isolation — secret env vars differ
  * 6. PlatformAuditService structural: no update/delete
@@ -64,15 +66,28 @@ function makeJwt() {
   } as unknown as JwtService;
 }
 
-function makeConfig() {
+function makeConfig(env: Record<string, string | undefined> = {}) {
+  const values: Record<string, string | undefined> = {
+    PLATFORM_JWT_SECRET: 'test-platform-secret-at-least-32-chars-long',
+    ...env,
+  };
   return {
-    getOrThrow: jest.fn().mockReturnValue('test-platform-secret-at-least-32-chars-long'),
+    get: jest.fn((key: string) => values[key]),
+    getOrThrow: jest.fn((key: string) => {
+      const val = values[key];
+      if (!val) throw new Error(`Missing config ${key}`);
+      return val;
+    }),
   } as unknown as ConfigService;
 }
 
 /** Directly instantiate services without NestJS DI container. */
-function buildServices(rawDb: ReturnType<typeof makeRawDb>, jwt = makeJwt()) {
-  const config = makeConfig();
+function buildServices(
+  rawDb: ReturnType<typeof makeRawDb>,
+  env: Record<string, string | undefined> = {},
+  jwt = makeJwt(),
+) {
+  const config = makeConfig(env);
   const db = rawDb as unknown as PlatformRawDb;
   const auditSvc = new PlatformAuditService(db);
   const totpSvc = new PlatformTwoFactorService(db, config);
@@ -191,21 +206,70 @@ describe('PlatformAuthService', () => {
       }),
     );
   });
+
+  // -------------------------------------------------------------------------
+  // PLATFORM_REQUIRE_2FA toggle on login
+  // -------------------------------------------------------------------------
+  it('logs in directly without 2FA step when PLATFORM_REQUIRE_2FA=false (even if user has 2FA enabled)', async () => {
+    const user = {
+      id: 'u1',
+      email: 'admin@example.com',
+      passwordHash: '$argon2id$hashed',
+      status: 'ACTIVE',
+      failedAttempts: 0,
+      lockedUntil: null,
+      twoFactorEnabled: true,
+      role: 'SUPER_ADMIN',
+    };
+    const rawDb = makeRawDb();
+    rawDb.findUserByEmail.mockResolvedValue(user);
+    rawDb.findUserById.mockResolvedValue({ role: user.role });
+    mockVerify.mockResolvedValue(true);
+
+    const { authSvc } = buildServices(rawDb, { PLATFORM_REQUIRE_2FA: 'false' });
+    const res = await authSvc.login({ email: user.email, password: 'correct' });
+
+    expect(res.type).toBe('success');
+    expect(rawDb.createSession).toHaveBeenCalled();
+  });
+
+  it('requires 2FA step on login when PLATFORM_REQUIRE_2FA=true and user has 2FA enabled', async () => {
+    const user = {
+      id: 'u1',
+      email: 'admin@example.com',
+      passwordHash: '$argon2id$hashed',
+      status: 'ACTIVE',
+      failedAttempts: 0,
+      lockedUntil: null,
+      twoFactorEnabled: true,
+      role: 'SUPER_ADMIN',
+    };
+    const rawDb = makeRawDb();
+    rawDb.findUserByEmail.mockResolvedValue(user);
+    mockVerify.mockResolvedValue(true);
+
+    const { authSvc } = buildServices(rawDb, { PLATFORM_REQUIRE_2FA: 'true' });
+    const res = await authSvc.login({ email: user.email, password: 'correct' });
+
+    expect(res.type).toBe('mfa_required');
+    expect(rawDb.createSession).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------
 // 3. MFA mandatory guard
 // ---------------------------------------------------------------------------
 describe('PlatformMfaGuard', () => {
-  it('throws MFA_SETUP_REQUIRED for SUPER_ADMIN without 2FA', () => {
-    const guard = new PlatformMfaGuard();
-    const ctx = {
+  const makeCtx = (user: { id: string; role: string; twoFactorEnabled: boolean }) =>
+    ({
       switchToHttp: () => ({
-        getRequest: () => ({
-          user: { id: 'u1', role: 'SUPER_ADMIN', twoFactorEnabled: false },
-        }),
+        getRequest: () => ({ user }),
       }),
-    } as unknown as Parameters<typeof guard.canActivate>[0];
+    }) as unknown as Parameters<PlatformMfaGuard['canActivate']>[0];
+
+  it('throws MFA_SETUP_REQUIRED for SUPER_ADMIN without 2FA when PLATFORM_REQUIRE_2FA=true', () => {
+    const guard = new PlatformMfaGuard(makeConfig({ PLATFORM_REQUIRE_2FA: 'true' }));
+    const ctx = makeCtx({ id: 'u1', role: 'SUPER_ADMIN', twoFactorEnabled: false });
 
     expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);
     try {
@@ -215,27 +279,27 @@ describe('PlatformMfaGuard', () => {
     }
   });
 
-  it('allows SUPER_ADMIN with 2FA enabled', () => {
-    const guard = new PlatformMfaGuard();
-    const ctx = {
-      switchToHttp: () => ({
-        getRequest: () => ({
-          user: { id: 'u1', role: 'SUPER_ADMIN', twoFactorEnabled: true },
-        }),
-      }),
-    } as unknown as Parameters<typeof guard.canActivate>[0];
+  it('allows SUPER_ADMIN with 2FA enabled when PLATFORM_REQUIRE_2FA=true', () => {
+    const guard = new PlatformMfaGuard(makeConfig({ PLATFORM_REQUIRE_2FA: 'true' }));
+    const ctx = makeCtx({ id: 'u1', role: 'SUPER_ADMIN', twoFactorEnabled: true });
     expect(guard.canActivate(ctx)).toBe(true);
   });
 
-  it('allows ANALYST regardless of 2FA', () => {
-    const guard = new PlatformMfaGuard();
-    const ctx = {
-      switchToHttp: () => ({
-        getRequest: () => ({
-          user: { id: 'u1', role: 'ANALYST', twoFactorEnabled: false },
-        }),
-      }),
-    } as unknown as Parameters<typeof guard.canActivate>[0];
+  it('allows ANALYST regardless of 2FA when PLATFORM_REQUIRE_2FA=true', () => {
+    const guard = new PlatformMfaGuard(makeConfig({ PLATFORM_REQUIRE_2FA: 'true' }));
+    const ctx = makeCtx({ id: 'u1', role: 'ANALYST', twoFactorEnabled: false });
+    expect(guard.canActivate(ctx)).toBe(true);
+  });
+
+  it('allows SUPER_ADMIN without 2FA when PLATFORM_REQUIRE_2FA=false', () => {
+    const guard = new PlatformMfaGuard(makeConfig({ PLATFORM_REQUIRE_2FA: 'false' }));
+    const ctx = makeCtx({ id: 'u1', role: 'SUPER_ADMIN', twoFactorEnabled: false });
+    expect(guard.canActivate(ctx)).toBe(true);
+  });
+
+  it('defaults to allowing SUPER_ADMIN without 2FA when PLATFORM_REQUIRE_2FA is unset', () => {
+    const guard = new PlatformMfaGuard(makeConfig({}));
+    const ctx = makeCtx({ id: 'u1', role: 'SUPER_ADMIN', twoFactorEnabled: false });
     expect(guard.canActivate(ctx)).toBe(true);
   });
 });

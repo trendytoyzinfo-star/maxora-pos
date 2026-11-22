@@ -37,6 +37,7 @@ export function usePlatformCurrentUser() {
         email: string;
         role: string;
         twoFactorEnabled: boolean;
+        require2fa?: boolean;
         lastLoginAt: string | null;
       }>("/me"),
     retry: false,
@@ -149,5 +150,14 @@ export function usePlatformSessions() {
           lastSeenAt: string;
         }>
       >("/security/sessions"),
+  });
+}
+
+export function usePlatformRevokeSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (sessionId: string) =>
+      apiFetch<void>(`/security/sessions/${sessionId}`, { method: "DELETE" }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["platform", "sessions"] }),
   });
 }

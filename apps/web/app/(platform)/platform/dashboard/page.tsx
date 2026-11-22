@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePlatformCurrentUser, usePlatformLogout } from "@/hooks/use-platform-auth";
 
@@ -20,7 +21,12 @@ export default function PlatformDashboardPage() {
   }, [isError, error, router]);
 
   useEffect(() => {
-    if (user && !user.twoFactorEnabled && (user.role === "SUPER_ADMIN" || user.role === "PLATFORM_ADMIN")) {
+    if (
+      user &&
+      user.require2fa === true &&
+      !user.twoFactorEnabled &&
+      (user.role === "SUPER_ADMIN" || user.role === "PLATFORM_ADMIN")
+    ) {
       router.replace("/platform/2fa-setup");
     }
   }, [user, router]);
@@ -46,14 +52,23 @@ export default function PlatformDashboardPage() {
             Super Admin Dashboard
           </p>
         </div>
-        <button
-          onClick={() => logout.mutate(undefined, { onSuccess: () => router.replace("/platform/login") })}
-          disabled={logout.isPending}
-          className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
-          style={{ background: "var(--plt-surface)", color: "var(--plt-muted)", border: "1px solid var(--plt-border)" }}
-        >
-          {logout.isPending ? "Signing out…" : "Sign out"}
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/platform/security"
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity hover:opacity-80"
+            style={{ background: "var(--plt-surface)", color: "var(--plt-text)", border: "1px solid var(--plt-border)" }}
+          >
+            Security
+          </Link>
+          <button
+            onClick={() => logout.mutate(undefined, { onSuccess: () => router.replace("/platform/login") })}
+            disabled={logout.isPending}
+            className="rounded-lg px-4 py-2 text-sm font-medium transition-opacity hover:opacity-80 disabled:opacity-50"
+            style={{ background: "var(--plt-surface)", color: "var(--plt-muted)", border: "1px solid var(--plt-border)" }}
+          >
+            {logout.isPending ? "Signing out…" : "Sign out"}
+          </button>
+        </div>
       </header>
 
       <div

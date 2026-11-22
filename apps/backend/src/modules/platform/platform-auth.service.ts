@@ -43,6 +43,10 @@ export class PlatformAuthService {
     return this.config.getOrThrow<string>('PLATFORM_JWT_SECRET');
   }
 
+  get isTwoFactorRequired(): boolean {
+    return this.config.get<string>('PLATFORM_REQUIRE_2FA') === 'true';
+  }
+
   private async verifyPassword(hash: string, password: string): Promise<boolean> {
     return argon2.verify(hash, password);
   }
@@ -201,8 +205,8 @@ export class PlatformAuthService {
       device: userAgent,
     });
 
-    // If 2FA is enabled → return MFA token, don't issue a session yet
-    if (user.twoFactorEnabled) {
+    // If server requires 2FA and user has 2FA enabled → return MFA token, don't issue a session yet
+    if (this.isTwoFactorRequired && user.twoFactorEnabled) {
       return { type: 'mfa_required', mfaToken: this.issueMfaToken(user.id) };
     }
 
@@ -338,10 +342,14 @@ export class PlatformAuthService {
   // ---------------------------------------------------------------------------
 
   async getMe(userId: string) {
-    return this.rawDb.findUserById(
+    const user = await this.rawDb.findUserById(
       userId,
       `id, name, email, role, "twoFactorEnabled", "lastLoginAt", "createdAt"`,
     );
+    return {
+      ...user,
+      require2fa: this.isTwoFactorRequired,
+    };
   }
 
   async getSessions(userId: string) {

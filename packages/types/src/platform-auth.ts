@@ -51,6 +51,7 @@ export const platformSessionUserSchema = z.object({
   email: z.string(),
   role: z.enum(PLATFORM_ROLES),
   twoFactorEnabled: z.boolean(),
+  require2fa: z.boolean().optional(),
   lastLoginAt: z.string().nullable(),
   createdAt: z.string(),
 });
